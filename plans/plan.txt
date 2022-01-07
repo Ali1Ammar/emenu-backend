@@ -1,0 +1,57 @@
+
+client (way of order and desgin) we could support
+normal resturant 
+car ordering
+theme parking 
+mail multi resturant
+multi brand resturant
+
+
+
+kitchen(may multi) for accept order
+
+normal resturant , car ordering  : cacher for paying , pay infront or after  ,  resturant phone on each table or qrcode
+theme parking : pay infront  and user should take his food   is important , resturant may has diffrent location
+mail :  support multi resturant , user could pack his food
+_______
+
+we will had 
+multi resturant (config to run as one) so support multibrand , mail , themeparking
+SpotOrders (Table or car parking spot , themeparking user location)
+kitchens (one for pizza order , other for burger , at themeparking each kitchen could also be another spot)
+select kitchen could be using the foodorder and SpotOrder(for themeparking , multi branch)
+
+payment:  in front or after , at cacher or to employeer (with msg to the user)
+deliver: employeer deliver to customer , customer take food from kitchen(or any where)  (with msg to the user)
+_____________________________
+
+car ordering is no diffrent from normal resturant except that needed the client using qrcode and pay infront
+multi brand resturant: configert either as multi resturant (like mail) if each has its cacher or as multi kitchen if all same manger and cacher
+_____________________________
+
+customer normal resturant Scenario
+
+customer access app
+start select food
+order his food
+            display msg to him for prepare the money and employeer come to him and take the money 
+            display msg  to go to cacher and pay
+start cocking the food
+when food done 
+    employeer brings the food to the customer
+    user got to take food
+        complete eating the food
+        make a feedback    
+            ask for pay from app display msg to him for prepare the money and employeer come to him and take the money 
+            display msg to customer , go to cacher and pay
+
+
+
+msg to user 
+payment msg (pleas go to cacher to pay , please wait for employeer to pay to him)
+pick order (your order ready pick him from counter 3 , your order is ready the employeer will bring him now)
+customer feedback msg (feedback us please)
+
+
+where we should return the app to menu (when the app start new order)
+what if the user need to order more food 
