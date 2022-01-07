@@ -5,9 +5,42 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// generator dbml {
+//   provider = "prisma-dbml-generator"
+// }
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../ERD.svg"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum SystemEmpType {
+  Admin
+  MangeResturant
+  Finical
+}
+
+model SystemAdmin {
+  id       Int           @id @default(autoincrement())
+  userName String
+  name     String
+  password String
+  type     SystemEmpType
+}
+
+enum PaymentType {
+  beforeTakeOrder
+  afterTakeOrder
+}
+
+enum DeliverType {
+  employeerDeliverFood
+  customerPickFood
 }
 
 enum ResturantEmpType {
@@ -15,7 +48,6 @@ enum ResturantEmpType {
   Kitchen
   Casher
 }
-
 
 model ResturantEmp {
   id          Int              @id @default(autoincrement())
@@ -33,17 +65,32 @@ model Resturant {
   img          String
   location     String
   isDisabled   Boolean
+  paymentType  PaymentType
+  deliverType  DeliverType
   admins       ResturantEmp[]
   MainCategory MainCategory[]
-  Table        Table[]
+  customerSpot   CustomerSpot[]
+  Kitchen      Kitchen[]
 }
 
-model Table {
+model Kitchen {
+  id          Int          @id @default(autoincrement())
+  resturatn   Resturant    @relation(fields: [resturantId], references: [id])
+  name        String
+  isDisabled  Boolean
+  customerSpot  CustomerSpot[]
+  meal        Meal[]
+  resturantId Int
+}
+
+model CustomerSpot {
   id          Int       @id @default(autoincrement())
   note        String?
   resturant   Resturant @relation(fields: [resturantId], references: [id])
   Order       Order[]
   resturantId Int
+  kitchen     Kitchen?  @relation(fields: [kitchenId], references: [id])
+  kitchenId   Int?
 }
 
 model MainCategory {
@@ -74,6 +121,8 @@ model Meal {
   subCategort   SubCategory @relation(fields: [SubCategoryId], references: [id])
   SubCategoryId Int
   OrderItem     OrderItem[]
+  Kitchen       Kitchen?    @relation(fields: [kitchenId], references: [id])
+  kitchenId     Int?
 }
 
 model OrderItem {
@@ -90,17 +139,16 @@ model Order {
   id               Int               @id @default(autoincrement())
   orderItems       OrderItem[]
   status           OrderStatus
-  table            Table             @relation(fields: [tableId], references: [id])
-  tableId          Int
+  customerSpot       CustomerSpot        @relation(fields: [customerSpotId], references: [id])
+  customerSpotId     Int
   customerFeedBack CustomerFeedBack?
 }
 
 enum OrderStatus {
-  Init
-  WaitInKitchen
-  Cocking
-  WaitDeliver
   WaitPayment
+  Cooking
+  Cooked
+  Delivered
   Canceled
   Done
 }
