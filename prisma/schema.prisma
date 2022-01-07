@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ResturantEmpType {
+  Admin
+  Kitchen
+  Casher
+}
+
+
+model ResturantEmp {
+  id          Int              @id @default(autoincrement())
+  userName    String
+  name        String
+  password    String
+  type        ResturantEmpType
+  Resturant   Resturant?       @relation(fields: [resturantId], references: [id])
+  resturantId Int?
+}
+
+model Resturant {
+  id           Int            @id @default(autoincrement())
+  name         String
+  img          String
+  location     String
+  isDisabled   Boolean
+  admins       ResturantEmp[]
+  MainCategory MainCategory[]
+  Table        Table[]
+}
+
+model Table {
+  id          Int       @id @default(autoincrement())
+  note        String?
+  resturant   Resturant @relation(fields: [resturantId], references: [id])
+  Order       Order[]
+  resturantId Int
+}
+
+model MainCategory {
+  id          Int           @id @default(autoincrement())
+  title       String
+  desc        String
+  img         String
+  resturant   Resturant     @relation(fields: [resturantId], references: [id])
+  children    SubCategory[]
+  resturantId Int
+}
+
+model SubCategory {
+  id             Int          @id @default(autoincrement())
+  title          String
+  img            String
+  mainCategoryId Int
+  mainCategory   MainCategory @relation(fields: [mainCategoryId], references: [id])
+  meals          Meal[]
+}
+
+model Meal {
+  id            Int         @id @default(autoincrement())
+  title         String
+  desc          String
+  img           String
+  price         Float
+  subCategort   SubCategory @relation(fields: [SubCategoryId], references: [id])
+  SubCategoryId Int
+  OrderItem     OrderItem[]
+}
+
+model OrderItem {
+  id      Int    @id @default(autoincrement())
+  meal    Meal   @relation(fields: [mealId], references: [id])
+  count   Int
+  notes   String
+  mealId  Int
+  Order   Order  @relation(fields: [orderId], references: [id])
+  orderId Int
+}
+
+model Order {
+  id               Int               @id @default(autoincrement())
+  orderItems       OrderItem[]
+  status           OrderStatus
+  table            Table             @relation(fields: [tableId], references: [id])
+  tableId          Int
+  customerFeedBack CustomerFeedBack?
+}
+
+enum OrderStatus {
+  Init
+  WaitInKitchen
+  Cocking
+  WaitDeliver
+  WaitPayment
+  Canceled
+  Done
+}
+
+model CustomerFeedBack {
+  id      Int            @id @default(autoincrement())
+  order   Order          @relation(fields: [orderId], references: [id])
+  desc    String
+  rate    Int
+  type    FeedBackType[]
+  orderId Int            @unique
+}
+
+enum FeedBackType {
+  BadFood
+  BadService
+  BadTiming
+}
