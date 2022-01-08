@@ -65,32 +65,32 @@ model Resturant {
   img          String
   location     String
   isDisabled   Boolean
-  paymentType  PaymentType
-  deliverType  DeliverType
   admins       ResturantEmp[]
   MainCategory MainCategory[]
-  customerSpot   CustomerSpot[]
+  customerSpot CustomerSpot[]
   Kitchen      Kitchen[]
 }
 
 model Kitchen {
-  id          Int          @id @default(autoincrement())
-  resturatn   Resturant    @relation(fields: [resturantId], references: [id])
-  name        String
-  isDisabled  Boolean
-  customerSpot  CustomerSpot[]
-  meal        Meal[]
-  resturantId Int
+  id           Int            @id @default(autoincrement())
+  resturatn    Resturant      @relation(fields: [resturantId], references: [id])
+  name         String
+  isDisabled   Boolean
+  customerSpot CustomerSpot[]
+  meal         Meal[]
+  resturantId  Int
+  orderType    OrderType[]
 }
 
 model CustomerSpot {
-  id          Int       @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   note        String?
-  resturant   Resturant @relation(fields: [resturantId], references: [id])
+  resturant   Resturant   @relation(fields: [resturantId], references: [id])
   Order       Order[]
   resturantId Int
-  kitchen     Kitchen?  @relation(fields: [kitchenId], references: [id])
+  kitchen     Kitchen?    @relation(fields: [kitchenId], references: [id])
   kitchenId   Int?
+  orderType   OrderType[]
 }
 
 model MainCategory {
@@ -135,13 +135,29 @@ model OrderItem {
   orderId Int
 }
 
+model OrderType {
+  id             Int           @id @default(autoincrement())
+  name           String
+  paymentMsg     String
+  deliverMsg     String
+  paymentType    PaymentType
+  deliverType    DeliverType
+  Order          Order[]
+  CustomerSpot   CustomerSpot? @relation(fields: [customerSpotId], references: [id])
+  customerSpotId Int?
+  Kitchen        Kitchen?      @relation(fields: [kitchenId], references: [id])
+  kitchenId      Int?
+}
+
 model Order {
   id               Int               @id @default(autoincrement())
   orderItems       OrderItem[]
   status           OrderStatus
-  customerSpot       CustomerSpot        @relation(fields: [customerSpotId], references: [id])
-  customerSpotId     Int
+  customerSpot     CustomerSpot      @relation(fields: [customerSpotId], references: [id])
+  customerSpotId   Int
   customerFeedBack CustomerFeedBack?
+  type             OrderType         @relation(fields: [orderTypeId], references: [id])
+  orderTypeId      Int
 }
 
 enum OrderStatus {
