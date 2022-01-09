@@ -5,13 +5,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// generator dbml {
-//   provider = "prisma-dbml-generator"
-// }
-
 generator erd {
   provider = "prisma-erd-generator"
-  output   = "../ERD.svg"
+  output   = "ERD.png"
 }
 
 datasource db {
@@ -19,18 +15,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 enum SystemEmpType {
   Admin
   MangeResturant
   Finical
-}
-
-model SystemAdmin {
-  id       Int           @id @default(autoincrement())
-  userName String
-  name     String
-  password String
-  type     SystemEmpType
 }
 
 enum PaymentType {
@@ -43,39 +32,44 @@ enum DeliverType {
   customerPickFood
 }
 
-enum ResturantEmpType {
-  Admin
-  Kitchen
-  Casher
+ enum UserPermissions {
+  SystemAdmin
+
+
+  
 }
 
-model ResturantEmp {
+model User {
   id          Int              @id @default(autoincrement())
-  userName    String
+  userName    String @unique
   name        String
   password    String
-  type        ResturantEmpType
+  permissons  UserPermissions[]
   Resturant   Resturant?       @relation(fields: [resturantId], references: [id])
   resturantId Int?
 }
 
 model Resturant {
-  id           Int            @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
+  isDisabled Boolean @default(true)
+
   name         String
   img          String
   location     String
-  isDisabled   Boolean
-  admins       ResturantEmp[]
+  admins       User[]
   MainCategory MainCategory[]
   customerSpot CustomerSpot[]
   Kitchen      Kitchen[]
+  orderType    OrderType[]
+
 }
 
 model Kitchen {
-  id           Int            @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
+  isDisabled Boolean @default(false)
+
   resturatn    Resturant      @relation(fields: [resturantId], references: [id])
   name         String
-  isDisabled   Boolean
   customerSpot CustomerSpot[]
   meal         Meal[]
   resturantId  Int
@@ -83,7 +77,9 @@ model Kitchen {
 }
 
 model CustomerSpot {
-  id          Int         @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
+  isDisabled Boolean @default(false)
+
   note        String?
   resturant   Resturant   @relation(fields: [resturantId], references: [id])
   Order       Order[]
@@ -91,6 +87,7 @@ model CustomerSpot {
   kitchen     Kitchen?    @relation(fields: [kitchenId], references: [id])
   kitchenId   Int?
   orderType   OrderType[]
+
 }
 
 model MainCategory {
@@ -118,9 +115,9 @@ model Meal {
   desc          String
   img           String
   price         Float
-  subCategort   SubCategory @relation(fields: [SubCategoryId], references: [id])
-  SubCategoryId Int
-  OrderItem     OrderItem[]
+  subCategort   SubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId Int
+  orderItem     OrderItem[]
   Kitchen       Kitchen?    @relation(fields: [kitchenId], references: [id])
   kitchenId     Int?
 }
@@ -142,11 +139,13 @@ model OrderType {
   deliverMsg     String
   paymentType    PaymentType
   deliverType    DeliverType
+  Resturant      Resturant    @relation(fields: [resturantId], references: [id])
+  resturantId    Int
+
   Order          Order[]
-  CustomerSpot   CustomerSpot? @relation(fields: [customerSpotId], references: [id])
-  customerSpotId Int?
-  Kitchen        Kitchen?      @relation(fields: [kitchenId], references: [id])
-  kitchenId      Int?
+  CustomerSpot   CustomerSpot[]
+  Kitchen        Kitchen[]
+
 }
 
 model Order {
