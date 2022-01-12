@@ -16,7 +16,6 @@ export class UserService {
   }
 
   async createUser(user: Prisma.UserUncheckedCreateInput) {
-    user.password = await PasswordHashHelper.hashPassword(user.password);
     await this.prisma.user.create({
       data: user,
     });

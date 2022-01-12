@@ -6,13 +6,15 @@ export class OurConfigService {
   constructor(public service: ConfigService) {}
 
    getConfig(): Config {
-    return;
+    return this.service.get("all");
   }
 }
 
 export default () => ({
-  port: parseInt(process.env.PORT) || 3000,
-  jwtSecrent: process.env.jwtSecrent,
+  "all" : {
+    port: parseInt(process.env.PORT) || 3000,
+    jwtSecrent: process.env.jwtSecrent,
+  }
 });
 
 interface Config {

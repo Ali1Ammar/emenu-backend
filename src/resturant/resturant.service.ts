@@ -8,7 +8,9 @@ import {
   Prisma,
   Resturant,
   SubCategory,
+  UserPermissions,
 } from '@prisma/client';
+import { RegisterDTO } from 'src/auth/dto/register.dto';
 import { PrismaService } from 'src/prisma.service';
 import {
   CreateMainCategoryDto,
@@ -17,20 +19,29 @@ import {
 import { CreateKitchenDto } from './dto/create-kitchen.dto';
 import { CreateMealDto } from './dto/create-meal.dto';
 import { CreateOrderTypeDto } from './dto/create-ordertype.dto';
-import { CreateResturantDto } from './dto/create-resturant.dto';
+import {
+  CreateResturantAndAdminDto,
+  CreateResturantDto,
+} from './dto/create-resturant.dto';
 import { CreateSpotDto } from './dto/create-spot.dto';
 
 @Injectable()
 export class ResturantService {
   constructor(private prisma: PrismaService) {}
 
-  create(createResturantDto: CreateResturantDto): Promise<Resturant> {
+  createResturantAndAdmin(dto: CreateResturantAndAdminDto): Promise<Resturant> {
     return this.prisma.resturant.create({
       data: {
-        ...createResturantDto,
+        ...dto.resturant,
         admins: {
-          connect: PrismaHelper.idsToObjects(createResturantDto.adminsId),
+          create: {
+            ...dto.admin,
+            permissons: [UserPermissions.ResturantAdmin],
+          },
         },
+        // admins: {
+        //   connect: PrismaHelper.idsToObjects(createResturantDto.adminsId),
+        // },
       },
     });
   }
@@ -148,7 +159,8 @@ export class ResturantService {
     });
   }
 
-  private unAuthrize() {//TODO
+  private unAuthrize() {
+    //TODO
     throw 'Only Admin Can edit this';
   }
 }

@@ -4,6 +4,7 @@ import { ResturantController } from './resturant.controller';
 
 @Module({
   controllers: [ResturantController],
-  providers: [ResturantService]
+  providers: [ResturantService],
+  exports:[ResturantService]
 })
 export class ResturantModule {}
