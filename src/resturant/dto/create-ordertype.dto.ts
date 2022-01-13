@@ -1,9 +1,16 @@
-import { DeliverType, OrderType, PaymentType } from "@prisma/client";
+import { DeliverType, OrderType, PaymentType } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { IsEnum, IsString, ValidateNested } from 'class-validator';
 
 export class CreateOrderTypeDto {
-    name: string
-    paymentMsg: string
-    deliverMsg: string
-    paymentType: PaymentType
-    deliverType: DeliverType
+  @IsString()
+  name: string;
+  @IsString()
+  paymentMsg: string;
+  @IsString()
+  deliverMsg: string;
+  @IsEnum(PaymentType)
+  paymentType: PaymentType;
+  @IsEnum(DeliverType)
+  deliverType: DeliverType;
 }

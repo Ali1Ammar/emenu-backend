@@ -1,15 +1,30 @@
-import { MinLength } from 'class-validator';
+import { Exclude, Type } from 'class-transformer';
+import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString, IsUrl, Length, MinLength, ValidateNested } from 'class-validator';
 import { RegisterDTO } from 'src/auth/dto/register.dto';
 export class CreateResturantDto {
+  @IsString()
+  @IsNotEmpty()
   name: string;
+  @IsNotEmpty()
+  @IsUrl()
   img: string;
+  @IsNotEmpty()
+  @IsString()
   location: string;
-  @MinLength(1)
-  adminsId: number[];
 }
 
 
 export class CreateResturantAndAdminDto {
+  @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => CreateResturantDto)
   resturant : CreateResturantDto
-  admin : RegisterDTO
+
+  @ValidateNested()
+  @IsOptional()
+  @Type(() => RegisterDTO)
+  admin? : RegisterDTO
+
+  @IsOptional()
+  adminsId: number[];
 }

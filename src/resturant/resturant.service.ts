@@ -5,12 +5,10 @@ import {
   MainCategory,
   Meal,
   OrderType,
-  Prisma,
   Resturant,
   SubCategory,
   UserPermissions,
 } from '@prisma/client';
-import { RegisterDTO } from 'src/auth/dto/register.dto';
 import { PrismaService } from 'src/prisma.service';
 import {
   CreateMainCategoryDto,
@@ -19,29 +17,36 @@ import {
 import { CreateKitchenDto } from './dto/create-kitchen.dto';
 import { CreateMealDto } from './dto/create-meal.dto';
 import { CreateOrderTypeDto } from './dto/create-ordertype.dto';
-import {
-  CreateResturantAndAdminDto,
-  CreateResturantDto,
-} from './dto/create-resturant.dto';
+import { CreateResturantAndAdminDto } from './dto/create-resturant.dto';
 import { CreateSpotDto } from './dto/create-spot.dto';
-
+import { PrismaHelper } from '../helper/prisma_helper';
 @Injectable()
 export class ResturantService {
   constructor(private prisma: PrismaService) {}
 
   createResturantAndAdmin(dto: CreateResturantAndAdminDto): Promise<Resturant> {
+    let create;
+    if (dto.admin) {
+      let perm = dto.admin.permissons ?? [];
+      if (!perm.includes(UserPermissions.ResturantAdmin)) {
+        perm.push(UserPermissions.ResturantAdmin);
+      }
+      create = dto.admin
+        ? {
+            ...dto.admin,
+            permissons: perm,
+          }
+        : undefined;
+    }
+
+    const connect = PrismaHelper.idsToObjects(dto.adminsId);
     return this.prisma.resturant.create({
       data: {
         ...dto.resturant,
         admins: {
-          create: {
-            ...dto.admin,
-            permissons: [UserPermissions.ResturantAdmin],
-          },
+          create,
+          connect,
         },
-        // admins: {
-        //   connect: PrismaHelper.idsToObjects(createResturantDto.adminsId),
-        // },
       },
     });
   }
@@ -51,7 +56,7 @@ export class ResturantService {
       data: {
         resturant: {
           connect: {
-            id: spot.resturantId,
+            id: resturantId,
           },
         },
         note: spot.note,
