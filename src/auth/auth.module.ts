@@ -7,6 +7,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { OurConfigService } from 'src/config.service';
 import { UserModule } from 'src/user/user.module';
 import { ResturantModule } from 'src/resturant/resturant.module';
+import { AuthController } from './auth.controller';
 
 @Module({
   imports: [
@@ -23,5 +24,6 @@ import { ResturantModule } from 'src/resturant/resturant.module';
     }),
   ],
   providers: [AuthService],
+  controllers:[AuthController]
 })
 export class AuthModule {}
