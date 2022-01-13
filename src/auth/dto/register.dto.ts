@@ -1,10 +1,16 @@
 import { UserPermissions } from '@prisma/client';
-import { MinLength } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class RegisterDTO   {
+  @IsString()
   userName: string;
+  @IsString()
   name: string;
-  permissons: UserPermissions[];
+  @IsArray()
+  @IsOptional()
+  permissons?: UserPermissions[];
+  @IsString()
+  @IsOptional()
   resturantId?: number;
   @MinLength(6)
   password: string;

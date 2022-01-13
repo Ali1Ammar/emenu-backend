@@ -23,7 +23,7 @@ import { AuthController } from './auth.controller';
       inject: [OurConfigService],
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService,JwtStrategy],
   controllers:[AuthController]
 })
 export class AuthModule {}
