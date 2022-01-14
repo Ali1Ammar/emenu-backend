@@ -6,6 +6,7 @@ import { PasswordHashHelper } from 'src/helper/hash_password';
 import { UserService } from 'src/user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
+import { JwtType } from './jwt-auth.guard';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,7 @@ export class AuthService {
     if (!isMatch) throw DefinedErrors.WrongPassword;
     delete user.password;
     return {
-      access_token: this.jwtService.sign(user),
+      access_token: this.jwtService.sign({...user , type:JwtType.login}),
     };
   }
 

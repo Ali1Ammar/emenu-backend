@@ -8,6 +8,7 @@ import { OurConfigService } from 'src/config.service';
 import { UserModule } from 'src/user/user.module';
 import { ResturantModule } from 'src/resturant/resturant.module';
 import { AuthController } from './auth.controller';
+import { OrderJwtStrategy } from './order-jwt.strategy';
 
 @Module({
   imports: [
@@ -18,12 +19,12 @@ import { AuthController } from './auth.controller';
     JwtModule.registerAsync({
       useFactory: async (configService: OurConfigService) => ({
         secret: configService.getConfig().jwtSecrent,
-        signOptions: { expiresIn: '7d' },
+        signOptions: { expiresIn: '3d' },
       }),
       inject: [OurConfigService],
     }),
   ],
-  providers: [AuthService,JwtStrategy],
-  controllers:[AuthController]
+  providers: [AuthService, JwtStrategy, OrderJwtStrategy],
+  controllers: [AuthController],
 })
 export class AuthModule {}

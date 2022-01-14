@@ -7,7 +7,7 @@ import { UserService } from 'src/user/user.service';
 import { JwtType } from './jwt-auth.guard';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class OrderJwtStrategy extends PassportStrategy(Strategy,'order-jwt') {
   constructor(
     configService: OurConfigService,
     private userService: UserService,
@@ -20,12 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload) {
-    if (payload.type != JwtType.login) {
-      throw ''; //TODO
+    if(payload.type!=JwtType.order) {
+        throw "";//TODO
     }
-    const user = await this.userService.findById(payload.id);
-    console.log(user);
-    delete user.password;
-    return user;
+    return payload;
   }
 }

@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { OrderStatus } from '@prisma/client';
+import { JwtType } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
 import { CreateCustomerFeedBackDto } from './dto/create-feedback.dto';
 import { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
 
 @Injectable()
 export class OrderService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
   async createOrder(createDto: CreateOrderDto) {
     const price = await this._calcPrice(createDto.orderItems);
@@ -23,6 +25,15 @@ export class OrderService {
         },
       },
     });
+
+    return {
+      access_token: this.jwtService.sign(
+        {
+          ...res,
+          type: JwtType.order,
+        }
+      ),
+    };
   }
 
   async updateStatus(id: number, status: OrderStatus) {

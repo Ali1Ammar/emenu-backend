@@ -12,7 +12,7 @@ import {
 } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PermissionGuard } from 'src/auth/permission.gurds';
-import { User, UserJwt } from 'src/auth/user.decoration';
+import { Payload, UserJwt } from 'src/auth/payload.decoration';
 import { DefinedErrors } from 'src/error/error';
 import {
   CreateMainCategoryDto,
@@ -29,14 +29,14 @@ import { ResturantService } from './resturant.service';
 export class ResturantAdminController {
   constructor(private readonly resturantService: ResturantService) {}
   @Post('customerSpot')
-  async addSpot(@Body() spot: CustomerSpot, @User() user: UserJwt) {
+  async addSpot(@Body() spot: CustomerSpot, @Payload() user: UserJwt) {
     await this.resturantService.addSpot(user.resturantId, spot);
   }
 
   @Post('main-category')
   async addMainCategory(
     @Body() data: CreateMainCategoryDto,
-    @User() user: UserJwt,
+    @Payload() user: UserJwt,
   ) {
     await this.resturantService.addMainCategory(user.resturantId, data);
   }
@@ -44,29 +44,29 @@ export class ResturantAdminController {
   @Post('sub-category')
   async addSubCategory(
     @Body() data: CreateSubCategoryDto,
-    @User() user: UserJwt,
+    @Payload() user: UserJwt,
   ) {
     await this.resturantService.addSubCategory(user.resturantId, data);
   }
 
   @Post('kitchen')
-  async addKitchen(@Body() data: CreateKitchenDto, @User() user: UserJwt) {
+  async addKitchen(@Body() data: CreateKitchenDto, @Payload() user: UserJwt) {
     await this.resturantService.addKitchen(user.resturantId, data);
   }
 
   @Post('order-type')
-  async addOrderType(@Body() data: CreateOrderTypeDto, @User() user: UserJwt) {
+  async addOrderType(@Body() data: CreateOrderTypeDto, @Payload() user: UserJwt) {
     await this.resturantService.addOrderType(user.resturantId, data);
   }
 
   @Post('meal')
-  async addMeal(@Body() data: CreateMealDto, @User() user: UserJwt) {
+  async addMeal(@Body() data: CreateMealDto, @Payload() user: UserJwt) {
     await this.resturantService.addMeal(user.resturantId, data);
   }
 
 
   @Get()
-  async getResturantWithRelation(@User() user:UserJwt){
+  async getResturantWithRelation(@Payload() user:UserJwt){
     if(!user.resturantId){
       throw DefinedErrors.wrongInput("this user does not has resturant");
     }
