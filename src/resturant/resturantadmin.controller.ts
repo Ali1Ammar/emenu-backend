@@ -3,20 +3,17 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   UseGuards,
 } from '@nestjs/common';
 import {
   CustomerSpot,
-  Prisma,
-  Resturant,
+
   UserPermissions,
 } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PermissionGuard } from 'src/auth/permission.gurds';
 import { User, UserJwt } from 'src/auth/user.decoration';
+import { DefinedErrors } from 'src/error/error';
 import {
   CreateMainCategoryDto,
   CreateSubCategoryDto,
@@ -25,8 +22,7 @@ import { CreateKitchenDto } from './dto/create-kitchen.dto';
 import { CreateMealDto } from './dto/create-meal.dto';
 import { CreateOrderTypeDto } from './dto/create-ordertype.dto';
 import { ResturantService } from './resturant.service';
-// import { CreateResturantDto } from './dto/create-resturant.dto';
-// import { UpdateResturantDto } from './dto/update-resturant.dto';
+
 
 @Controller('resturant/admin')
 @UseGuards(new JwtAuthGuard(),new PermissionGuard(UserPermissions.ResturantAdmin))
@@ -67,4 +63,14 @@ export class ResturantAdminController {
   async addMeal(@Body() data: CreateMealDto, @User() user: UserJwt) {
     await this.resturantService.addMeal(user.resturantId, data);
   }
+
+
+  @Get()
+  async getResturantWithRelation(@User() user:UserJwt){
+    if(!user.resturantId){
+      throw DefinedErrors.wrongInput('this user doesnt has resturant');
+    }
+    return this.resturantService.findById(user.resturantId);
+  }
+  
 }

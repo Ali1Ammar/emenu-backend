@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { UserPermissions } from '@prisma/client';
 import { CreateSystemAdminDto, RegisterDTO } from 'src/auth/dto/register.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -13,7 +13,7 @@ import { UserService } from 'src/user/user.service';
 import { AdminService } from './admin.service';
 
 @Controller('admin')
-@UseGuards(new JwtAuthGuard())
+@UseGuards(new JwtAuthGuard(), new PermissionGuard(UserPermissions.SystemAdmin))
 export class AdminController {
   constructor(
     private adminService: AdminService,
@@ -22,13 +22,11 @@ export class AdminController {
     private resturantService: ResturantService,
   ) {}
   @Post()
-  @UseGuards(new PermissionGuard(UserPermissions.SystemAdmin))
   async createAdmin(@Body() body: CreateSystemAdminDto) {
     await this.adminService.createSystemAdmin(body);
   }
 
   @Post('resturant')
-  @UseGuards(new PermissionGuard(UserPermissions.SystemAdmin))
   async createResturant(@Body() body: CreateResturantAndAdminDto) {
     if (!body.adminsId?.length && !body.admin) {
       throw DefinedErrors.wrongInput(
@@ -41,5 +39,10 @@ export class AdminController {
         body.adminsId,
         UserPermissions.ResturantAdmin,
       );
+  }
+
+  @Get('resturant')
+  async getAllResturantInSystem() {
+    return this.resturantService.findAll();
   }
 }

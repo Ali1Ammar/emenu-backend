@@ -5,6 +5,7 @@ import {
   MainCategory,
   Meal,
   OrderType,
+  Prisma,
   Resturant,
   SubCategory,
   UserPermissions,
@@ -156,7 +157,7 @@ export class ResturantService {
     });
   }
 
-  findAll(isDisabled?: boolean): Promise<Resturant[]> {
+  findAll(isDisabled = false): Promise<Resturant[]> {
     return this.prisma.resturant.findMany({
       where: {
         isDisabled: isDisabled,
@@ -164,8 +165,36 @@ export class ResturantService {
     });
   }
 
+  async findById(id: number): Promise<ResturantRelationDTO> {
+    const res = await this.prisma.resturant.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        Kitchen: true,
+        MainCategory: {
+          include: {
+            children: true,
+          },
+        },
+        customerSpot: true,
+        orderType: true,
+      },
+    });
+    return res;
+  }
+
   private unAuthrize() {
     //TODO
     throw 'Only Admin Can edit this';
   }
 }
+
+type ResturantRelationDTO = Resturant & {
+  Kitchen: Kitchen[];
+  MainCategory: (MainCategory & {
+    children: SubCategory[];
+  })[];
+  customerSpot: CustomerSpot[];
+  orderType: OrderType[];
+};
