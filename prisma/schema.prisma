@@ -141,6 +141,7 @@ model OrderType {
   deliverType    DeliverType
   Resturant      Resturant    @relation(fields: [resturantId], references: [id])
   resturantId    Int
+  selectKitchenVia SelectKitchenVia
 
   Order          Order[]
   CustomerSpot   CustomerSpot[]
@@ -183,4 +184,11 @@ enum FeedBackType {
   BadFood
   BadService
   BadTiming
+}
+
+
+enum SelectKitchenVia {
+  None
+  CustomerSpot
+  Meal
 }
