@@ -165,6 +165,14 @@ export class ResturantService {
     });
   }
 
+  findAllForClient(): Promise<Resturant[]> {
+    return this.prisma.resturant.findMany({
+      where: {
+        isDisabled: false,
+      },
+    });
+  }
+
   async findById(id: number): Promise<ResturantRelationDTO> {
     const res = await this.prisma.resturant.findUnique({
       where: {
@@ -184,11 +192,41 @@ export class ResturantService {
     return res;
   }
 
+  async findByIdForClient(id: number): Promise<GetResturantClientDto> {
+    const res = await this.prisma.resturant.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        MainCategory: {
+          include: {
+            children: {
+              include: {
+                meals: true,
+              },
+            },
+          },
+        },
+        orderType: true,
+      },
+    });
+    return res;
+  }
+
   private unAuthrize() {
     //TODO
     throw 'Only Admin Can edit this';
   }
 }
+
+type GetResturantClientDto = Resturant & {
+  MainCategory: (MainCategory & {
+    children: (SubCategory & {
+      meals: Meal[];
+    })[];
+  })[];
+  orderType: OrderType[];
+};
 
 type ResturantRelationDTO = Resturant & {
   Kitchen: Kitchen[];

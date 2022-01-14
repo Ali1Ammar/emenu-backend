@@ -68,7 +68,7 @@ export class ResturantAdminController {
   @Get()
   async getResturantWithRelation(@User() user:UserJwt){
     if(!user.resturantId){
-      throw DefinedErrors.wrongInput('this user doesnt has resturant');
+      throw DefinedErrors.wrongInput("this user does not has resturant");
     }
     return this.resturantService.findById(user.resturantId);
   }
