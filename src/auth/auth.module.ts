@@ -16,13 +16,6 @@ import { OrderJwtStrategy } from './order-jwt.strategy';
     PassportModule,
     ResturantModule,
     UserModule,
-    JwtModule.registerAsync({
-      useFactory: async (configService: OurConfigService) => ({
-        secret: configService.getConfig().jwtSecrent,
-        signOptions: { expiresIn: '3d' },
-      }),
-      inject: [OurConfigService],
-    }),
   ],
   providers: [AuthService, JwtStrategy, OrderJwtStrategy],
   controllers: [AuthController],

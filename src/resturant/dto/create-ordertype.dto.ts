@@ -1,4 +1,4 @@
-import { DeliverType, OrderType, PaymentType } from '@prisma/client';
+import { DeliverType, OrderType, PaymentType, SelectKitchenVia } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsEnum, IsString, ValidateNested } from 'class-validator';
 
@@ -13,4 +13,6 @@ export class CreateOrderTypeDto {
   paymentType: PaymentType;
   @IsEnum(DeliverType)
   deliverType: DeliverType;
+  @IsEnum(SelectKitchenVia)
+  selectKitchenVia:SelectKitchenVia
 }
