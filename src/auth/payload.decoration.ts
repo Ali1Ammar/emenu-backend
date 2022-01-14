@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import {  UserPermissions } from '@prisma/client';
+import {  Order, UserPermissions } from '@prisma/client';
 
 export const Payload = createParamDecorator<ExecutionContext>(
   (data: unknown,ctx: ExecutionContext) => {
@@ -18,3 +18,6 @@ export type UserJwt = {
   permissons: UserPermissions[];
   resturantId?: number;
 };
+
+
+export type OrderJwt = Order;

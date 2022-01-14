@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { OrderStatus } from '@prisma/client';
+import {
+  CustomerSpot,
+  Order,
+  OrderStatus,
+  OrderType,
+  PaymentType,
+} from '@prisma/client';
 import { JwtType } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
 import { CreateCustomerFeedBackDto } from './dto/create-feedback.dto';
@@ -27,12 +33,10 @@ export class OrderService {
     });
 
     return {
-      access_token: this.jwtService.sign(
-        {
-          ...res,
-          type: JwtType.order,
-        }
-      ),
+      access_token: this.jwtService.sign({
+        ...res,
+        type: JwtType.order,
+      }),
     };
   }
 
@@ -47,12 +51,50 @@ export class OrderService {
     });
   }
 
-  async addCustomerFeedback(id: number, feedback: CreateCustomerFeedBackDto) {
+  async payed(id: number) {
+    const order = await this.getOrderById(id);
+    order.type.paymentType;
+    let nextStatus: OrderStatus;
+    if (order.type.paymentType == PaymentType.beforeTakeOrder) {
+      nextStatus = OrderStatus.WaitInKitchen;
+    } else if (order.type.paymentType == PaymentType.afterTakeOrder) {
+      nextStatus = OrderStatus.Done;
+    }
     await this.prisma.order.update({
       data: {
-        customerFeedBack: {
-          create: feedback,
-        },
+        isPayed: true,
+        status: nextStatus,
+      },
+      where: {
+        id: id,
+      },
+    });
+  }
+
+  async getOrderById(id: number): Promise<GetOrderDto> {
+    return this.prisma.order.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        type: true,
+        customerSpot: true,
+      },
+    });
+  }
+
+  async addCustomerFeedbackAndMarkAsDone(
+    id: number,
+    feedback: CreateCustomerFeedBackDto,
+  ) {
+    await this.prisma.order.update({
+      data: {
+        customerFeedBack: feedback
+          ? {
+              create: feedback,
+            }
+          : undefined,
+        status: OrderStatus.Done,
       },
       where: {
         id: id,
@@ -93,3 +135,8 @@ export class OrderService {
     return price;
   }
 }
+
+export type GetOrderDto = Order & {
+  customerSpot: CustomerSpot;
+  type: OrderType;
+};
