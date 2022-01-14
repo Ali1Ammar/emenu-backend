@@ -158,6 +158,7 @@ model Order {
   customerFeedBack CustomerFeedBack?
   type             OrderType         @relation(fields: [orderTypeId], references: [id])
   orderTypeId      Int
+  price Int
 }
 
 enum OrderStatus {
