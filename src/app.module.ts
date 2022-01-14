@@ -7,8 +7,9 @@ import configuration, { OurConfigService } from './config.service';
 import { GlobalModule } from './global.module';
 import { UserModule } from './user/user.module';
 import { PrismaService } from './prisma.service';
+import { OrderModule } from './order/order.module';
 
 @Module({
-  imports: [ GlobalModule , ResturantModule, AdminModule, AuthModule, UserModule],
+  imports: [ GlobalModule , ResturantModule, AdminModule, AuthModule, UserModule, OrderModule],
 })
 export class AppModule {}
