@@ -5,8 +5,7 @@ export class CreateMealDto {
   title: string;
   @IsString()
   desc: string;
-  @IsString()
-  img: string;
+
   @IsNumber()
   price: number;
   @IsNumber()

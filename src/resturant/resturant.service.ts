@@ -153,7 +153,7 @@ export class ResturantService {
     });
   }
 
-  async addMeal(resturantId: number, meal: CreateMealDto): Promise<Meal> {
+  async addMeal(resturantId: number, meal: CreateMealDto,img:string): Promise<Meal> {
     const subCategory = await this.prisma.subCategory.findFirst({
       where: {
         id: meal.subCategoryId,
@@ -179,6 +179,7 @@ export class ResturantService {
     return this.prisma.meal.create({
       data: {
         ...meal,
+        img
       },
     });
   }

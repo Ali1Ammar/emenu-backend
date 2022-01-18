@@ -70,8 +70,13 @@ export class ResturantAdminController {
   }
 
   @Post('meal')
-  async addMeal(@Body() data: CreateMealDto, @Payload() user: UserJwt) {
-    await this.resturantService.addMeal(user.resturantId, data);
+  @UseInterceptors(FileInterceptor('img'))
+  async addMeal(
+    @Body() data: CreateMealDto,
+    @Payload() user: UserJwt,
+    @UploadedFile() img: Express.Multer.File,
+  ) {
+    await this.resturantService.addMeal(user.resturantId, data,img.path);
   }
 
   @Get()
