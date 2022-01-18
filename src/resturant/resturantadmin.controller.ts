@@ -6,6 +6,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Param,
 } from '@nestjs/common';
 import { CustomerSpot, UserPermissions } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -21,11 +22,14 @@ import { CreateMealDto } from './dto/create-meal.dto';
 import { CreateOrderTypeDto } from './dto/create-ordertype.dto';
 import { ResturantService } from './resturant.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { HasResturantGuard } from './has_resturant.gurad';
 
 @Controller('resturantadmin')
 @UseGuards(
   new JwtAuthGuard(),
   new PermissionGuard(UserPermissions.ResturantAdmin),
+  new HasResturantGuard()
+
 )
 export class ResturantAdminController {
   constructor(private readonly resturantService: ResturantService) {}
@@ -81,9 +85,19 @@ export class ResturantAdminController {
 
   @Get()
   async getLinkedResturant(@Payload() user: UserJwt) {
-    if (!user.resturantId) {
-      throw DefinedErrors.wrongInput('this user does not has resturant');
-    }
+    // this.enureUserHasRest(user);
     return this.resturantService.findById(user.resturantId);
   }
+
+  @Post('active/:val')
+  activeResturant(@Param('val') active: boolean, @Payload() user: UserJwt) {
+    // this.enureUserHasRest(user);
+    return this.resturantService.acriveResturant(user.resturantId, active);
+  }
+
+  // enureUserHasRest(user: UserJwt) {
+  //   if (!user.resturantId) {
+  //     throw DefinedErrors.wrongInput('this user does not has resturant');
+  //   }
+  // }
 }

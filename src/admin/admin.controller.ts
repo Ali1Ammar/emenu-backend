@@ -70,4 +70,9 @@ export class AdminController {
   async getResturantViaId(@Param('id') id: number) {
     return this.resturantService.findById(id);
   }
+
+  @Post('resturant/:id/active/:val')
+  activeResturant( @Param("id") id:number , @Param('val') active: boolean) {
+    return this.resturantService.acriveResturant(id, active);
+  }
 }

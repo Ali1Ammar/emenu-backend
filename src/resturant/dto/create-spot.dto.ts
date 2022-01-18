@@ -4,7 +4,7 @@ import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
 export class CreateSpotDto {
   @IsOptional()
   @IsString()
-  note?: string;
+  identifier: string;
   @IsOptional()
   @IsNumber()
   kitchenId?: number;

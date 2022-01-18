@@ -57,9 +57,9 @@ model Resturant {
   img          String
   location     String
   admins       User[]
-  MainCategory MainCategory[]
+  mainCategory MainCategory[]
   customerSpot CustomerSpot[]
-  Kitchen      Kitchen[]
+  kitchen      Kitchen[]
   orderType    OrderType[]
 
 }
@@ -80,9 +80,9 @@ model CustomerSpot {
   id         Int     @id @default(autoincrement())
   isDisabled Boolean @default(false)
 
-  note        String?
+  identifier  String
   resturant   Resturant   @relation(fields: [resturantId], references: [id])
-  Order       Order[]
+  order       Order[]
   resturantId Int
   kitchen     Kitchen?    @relation(fields: [kitchenId], references: [id])
   kitchenId   Int?
@@ -118,7 +118,7 @@ model Meal {
   subCategort   SubCategory @relation(fields: [subCategoryId], references: [id])
   subCategoryId Int
   orderItem     OrderItem[]
-  Kitchen       Kitchen?    @relation(fields: [kitchenId], references: [id])
+  kitchen       Kitchen?    @relation(fields: [kitchenId], references: [id])
   kitchenId     Int?
 }
 
@@ -139,13 +139,13 @@ model OrderType {
   deliverMsg     String
   paymentType    PaymentType
   deliverType    DeliverType
-  Resturant      Resturant    @relation(fields: [resturantId], references: [id])
+  resturant      Resturant    @relation(fields: [resturantId], references: [id])
   resturantId    Int
   selectKitchenVia SelectKitchenVia
 
-  Order          Order[]
-  CustomerSpot   CustomerSpot[]
-  Kitchen        Kitchen[]
+  order          Order[]
+  customerSpot   CustomerSpot[]
+  kitchen        Kitchen[]
 
 }
 

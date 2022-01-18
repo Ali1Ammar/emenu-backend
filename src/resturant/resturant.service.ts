@@ -86,7 +86,7 @@ export class ResturantService {
             id: resturantId,
           },
         },
-        note: spot.note,
+        identifier: spot.identifier,
         orderType: {
           connect: {
             id: 2,
@@ -208,8 +208,8 @@ export class ResturantService {
         id,
       },
       include: {
-        Kitchen: true,
-        MainCategory: {
+        kitchen: true,
+        mainCategory: {
           include: {
             children: true,
           },
@@ -228,7 +228,7 @@ export class ResturantService {
         isDisabled: false,
       },
       include: {
-        MainCategory: {
+        mainCategory: {
           include: {
             children: {
               include: {
@@ -243,6 +243,18 @@ export class ResturantService {
     return res;
   }
 
+  async acriveResturant(id: number, active: boolean) {
+    const res = await this.prisma.resturant.update({
+      where: {
+        id,
+      },
+      data: {
+        isDisabled: !active,
+      },
+    });
+    return res;
+  }
+
   private unAuthrize() {
     //TODO
     throw 'Only Admin Can edit this';
@@ -250,7 +262,7 @@ export class ResturantService {
 }
 
 type GetResturantClientDto = Resturant & {
-  MainCategory: (MainCategory & {
+  mainCategory: (MainCategory & {
     children: (SubCategory & {
       meals: Meal[];
     })[];
@@ -259,8 +271,8 @@ type GetResturantClientDto = Resturant & {
 };
 
 type ResturantRelationDTO = Resturant & {
-  Kitchen: Kitchen[];
-  MainCategory: (MainCategory & {
+  kitchen: Kitchen[];
+  mainCategory: (MainCategory & {
     children: SubCategory[];
   })[];
   customerSpot: CustomerSpot[];
