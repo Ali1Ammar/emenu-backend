@@ -111,10 +111,12 @@ export class ResturantService {
   addMainCategory(
     resturantId: number,
     category: CreateMainCategoryDto,
+    img:string
   ): Promise<MainCategory> {
     return this.prisma.mainCategory.create({
       data: {
         ...category,
+        img,
         resturantId: resturantId,
       },
     });

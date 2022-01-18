@@ -103,7 +103,7 @@ model MainCategory {
 model SubCategory {
   id             Int          @id @default(autoincrement())
   title          String
-  img            String
+  // img            String
   mainCategoryId Int
   mainCategory   MainCategory @relation(fields: [mainCategoryId], references: [id])
   meals          Meal[]
