@@ -14,9 +14,11 @@ export class AdminService {
 
   async createDefualtAdmin() {
     try {
+      const hash = await PasswordHashHelper.hashPassword('admin');
+
       await this.userService.createUser({
         name: 'Defualt',
-        password: 'admin',
+        password: hash,
         permissons: [UserPermissions.SystemAdmin],
         userName: 'admin',
         id: 0, //So we can't create other defualt admin by mistake

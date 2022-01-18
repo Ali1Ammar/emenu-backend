@@ -22,6 +22,7 @@ import { CreateResturantAndAdminDto } from './dto/create-resturant.dto';
 import { CreateSpotDto } from './dto/create-spot.dto';
 import { PrismaHelper } from '../helper/prisma_helper';
 import { DefinedErrors } from 'src/error/error';
+import { PasswordHashHelper } from 'src/helper/hash_password';
 @Injectable()
 export class ResturantService {
   constructor(private prisma: PrismaService) {}
@@ -36,12 +37,13 @@ export class ResturantService {
       if (!perm.includes(UserPermissions.ResturantAdmin)) {
         perm.push(UserPermissions.ResturantAdmin);
       }
-      create = dto.admin
-        ? {
-            ...dto.admin,
-            permissons: perm,
-          }
-        : undefined;
+      dto.admin.password = await PasswordHashHelper.hashPassword(
+        dto.admin.password,
+      );
+      create = {
+        ...dto.admin,
+        permissons: perm,
+      };
     }
 
     const connect =
@@ -111,7 +113,7 @@ export class ResturantService {
   addMainCategory(
     resturantId: number,
     category: CreateMainCategoryDto,
-    img:string
+    img: string,
   ): Promise<MainCategory> {
     return this.prisma.mainCategory.create({
       data: {
@@ -153,7 +155,11 @@ export class ResturantService {
     });
   }
 
-  async addMeal(resturantId: number, meal: CreateMealDto,img:string): Promise<Meal> {
+  async addMeal(
+    resturantId: number,
+    meal: CreateMealDto,
+    img: string,
+  ): Promise<Meal> {
     const subCategory = await this.prisma.subCategory.findFirst({
       where: {
         id: meal.subCategoryId,
@@ -179,7 +185,7 @@ export class ResturantService {
     return this.prisma.meal.create({
       data: {
         ...meal,
-        img
+        img,
       },
     });
   }
