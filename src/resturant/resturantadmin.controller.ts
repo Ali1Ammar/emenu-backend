@@ -22,7 +22,7 @@ import { CreateOrderTypeDto } from './dto/create-ordertype.dto';
 import { ResturantService } from './resturant.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-@Controller('resturant/admin')
+@Controller('resturantadmin')
 @UseGuards(
   new JwtAuthGuard(),
   new PermissionGuard(UserPermissions.ResturantAdmin),
@@ -76,7 +76,7 @@ export class ResturantAdminController {
     @Payload() user: UserJwt,
     @UploadedFile() img: Express.Multer.File,
   ) {
-    await this.resturantService.addMeal(user.resturantId, data,img.path);
+    await this.resturantService.addMeal(user.resturantId, data, img.path);
   }
 
   @Get()
