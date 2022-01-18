@@ -17,7 +17,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.userService.findByUserName(loginDto.username);
-    if (!user) throw  DefinedErrors.UserNotFound ; 
+    if (!user) throw DefinedErrors.UserNotFound;
     const isMatch = await PasswordHashHelper.comparePassword(
       loginDto.password,
       user.password,
@@ -25,10 +25,18 @@ export class AuthService {
     if (!isMatch) throw DefinedErrors.WrongPassword;
     delete user.password;
     return {
-      access_token: this.jwtService.sign({...user , type:JwtType.login}),
+      access_token: this.jwtService.sign({ ...user, type: JwtType.login }),
+      user: user,
     };
   }
 
+  async reCreateJwtById(id: number) {
+    const user = this.userService.findById(id);
+    return {
+      access_token: this.jwtService.sign({ ...user, type: JwtType.login }),
+      user: user,
+    };
+  }
 
   // async registerNewAdmin(registerDto:RegisterSystemAdminDTO){
   //   this.adminService.createDefualtAdmin

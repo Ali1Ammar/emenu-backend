@@ -66,7 +66,7 @@ export class ResturantAdminController {
 
 
   @Get()
-  async getResturantWithRelation(@Payload() user:UserJwt){
+  async getLinkedResturant(@Payload() user:UserJwt){
     if(!user.resturantId){
       throw DefinedErrors.wrongInput("this user does not has resturant");
     }
