@@ -92,11 +92,11 @@ export class ResturantService {
             id: 2,
           },
         },
-        kitchen: {
-          connect: {
-            id: spot.kitchenId,
-          },
-        },
+        // kitchen: {
+        //   connect: {
+        //     id: spot.kitchenId,
+        //   },
+        // },
       },
     });
   }
@@ -120,6 +120,11 @@ export class ResturantService {
         ...category,
         img,
         resturantId: resturantId,
+        children : {
+          createMany : {
+            data :  category.children.map((v)=>{return {"title":v}})
+          }
+        }
       },
     });
   }
@@ -167,7 +172,9 @@ export class ResturantService {
           resturantId: resturantId,
         },
       },
-      select: {},
+      select: {
+        id:true
+      },
     });
     if (subCategory == null) this.unAuthrize();
 
@@ -177,7 +184,7 @@ export class ResturantService {
           id: meal.kitchenId,
           resturantId: resturantId,
         },
-        select: {},
+        select: {id:true},
       });
       if (kitchen == null) this.unAuthrize();
     }

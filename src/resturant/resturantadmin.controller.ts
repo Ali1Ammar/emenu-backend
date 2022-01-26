@@ -45,6 +45,10 @@ export class ResturantAdminController {
     @Payload() user: UserJwt,
     @UploadedFile() img: Express.Multer.File,
   ) {
+    
+    if(typeof data.children == 'string'){// when using form data and sent one element this make it recive as string
+      data.children = [data.children];
+    }
     await this.resturantService.addMainCategory(
       user.resturantId,
       data,
@@ -76,7 +80,7 @@ export class ResturantAdminController {
   @Post('meal')
   @UseInterceptors(FileInterceptor('img'))
   async addMeal(
-    @Body() data: CreateMealDto,
+    @Body() data:CreateMealDto,
     @Payload() user: UserJwt,
     @UploadedFile() img: Express.Multer.File,
   ) {

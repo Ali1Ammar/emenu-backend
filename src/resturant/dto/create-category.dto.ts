@@ -1,10 +1,12 @@
-import { IsNumber, IsString, IsUrl } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString, IsUrl } from 'class-validator';
 
 export class CreateMainCategoryDto {
   @IsString()
   title: string;
   @IsString()
   desc: string;
+  @IsNotEmpty()
+  children : string[]
   // @IsUrl()
   // img: string;
 }
