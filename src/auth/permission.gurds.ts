@@ -15,4 +15,4 @@ export class PermissionGuard implements CanActivate {
   }
 }
 
-let checker = (arr, target) => target.every((v) => arr.includes(v));
+let checker = <T>(arr:T[], target:T[]) => target.some((v) => arr.includes(v));

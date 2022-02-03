@@ -228,6 +228,27 @@ export class ResturantService {
     return res;
   }
 
+  async findMealByResturantId(id: number): Promise<Meal[]> {
+    const res = await this.prisma.meal.findMany({
+      where: {
+        kitchen : {
+          resturantId: id
+        }
+      },
+      // include: {
+      //   // kitchen: true,
+      //   // mainCategory: {
+      //   //   include: {
+      //   //     children: true,
+      //   //   },
+      //   // },
+      //   // customerSpot: true,
+      //   // orderType: true,
+      // },
+    });
+    return res;
+  }
+
   async findByIdForClient(id: number): Promise<GetResturantClientDto> {
     const res = await this.prisma.resturant.findFirst({
       where: {

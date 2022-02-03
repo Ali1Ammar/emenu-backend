@@ -115,7 +115,8 @@ model Meal {
   desc          String
   img           String
   price         Float
-  subCategort   SubCategory @relation(fields: [subCategoryId], references: [id])
+  isDisabled Boolean @default(false)
+  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
   subCategoryId Int
   orderItem     OrderItem[]
   kitchen       Kitchen?    @relation(fields: [kitchenId], references: [id])
@@ -152,13 +153,14 @@ model OrderType {
 model Order {
   id               Int               @id @default(autoincrement())
   orderItems       OrderItem[]
+  kitchenIds Int[]
   status           OrderStatus
   customerSpot     CustomerSpot      @relation(fields: [customerSpotId], references: [id])
   customerSpotId   Int
   customerFeedBack CustomerFeedBack?
   type             OrderType         @relation(fields: [orderTypeId], references: [id])
   orderTypeId      Int
-  price Int
+  price Float
   isPayed Boolean @default(false)
 }
 

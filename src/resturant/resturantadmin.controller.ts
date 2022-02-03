@@ -84,7 +84,13 @@ export class ResturantAdminController {
     @Payload() user: UserJwt,
     @UploadedFile() img: Express.Multer.File,
   ) {
-    await this.resturantService.addMeal(user.resturantId, data, img.path);
+    return await this.resturantService.addMeal(user.resturantId, data, img.path);
+  }
+
+  @Get("meal")
+  async getLinkedMealResturant(@Payload() user: UserJwt) {
+    // this.enureUserHasRest(user);
+    return this.resturantService.findMealByResturantId(user.resturantId);
   }
 
   @Get()

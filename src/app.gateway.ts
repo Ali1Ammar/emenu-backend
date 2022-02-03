@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { JwtType } from 'src/auth/jwt-auth.guard';
 import { OrderJwt, UserJwt } from 'src/auth/payload.decoration';
-import { GetOrderDto } from './order/order.service';
+import { GetOrderDto, GetOrderRelation } from './order/order.service';
 import { OrderStatus } from '@prisma/client';
 
 @WebSocketGateway()
@@ -73,17 +73,38 @@ export class AppGateway implements OnGatewayConnection {
     }
   }
 
-  emitOrder(resturantId: number, order: GetOrderDto, kitchenId: number[]) {
-    this.server.to(`ResturnatOrder-${resturantId}`).emit('order', order);
+  emitOrder(resturantId: number, order: GetOrderRelation, kitchenId: number[]) {
+    this.emitToRestAndKitchen(resturantId, kitchenId, 'order', order);
+  }
+
+  private emitToRestAndKitchen(
+    resturantId: number,
+    kitchenId: number[],
+    key,
+    value,
+  ) {
+    this.server.to(`ResturnatOrder-${resturantId}`).emit(key, value);
     if (kitchenId)
       kitchenId.forEach((v) => {
         this.server
           .to(`ResturnatKitchenOrder-${resturantId}-${v}`)
-          .emit('order', order);
+          .emit(key, value);
       });
   }
 
-  emitOrderStatusChangeToCustomer(orderId: number, status: OrderStatus) {
-    this.server.to(`CustomerOrder-${orderId}`).emit('order-change', status);
+  emitOrderChange(
+    resturantId: number,
+    kitchenId: number[],
+    orderId: number,
+    status?: OrderStatus,
+    isPayed?: boolean,
+  ) {
+    const change = {
+      id: orderId,
+      status,
+      isPayed,
+    };
+    this.emitToRestAndKitchen(resturantId, kitchenId, 'order-change', change);
+    this.server.to(`CustomerOrder-${orderId}`).emit('order-change', change);
   }
 }

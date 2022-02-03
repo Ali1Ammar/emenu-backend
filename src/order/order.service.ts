@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
+  CustomerFeedBack,
   CustomerSpot,
   Order,
+  OrderItem,
   OrderStatus,
   OrderType,
   PaymentType,
@@ -39,12 +41,18 @@ export class OrderService {
     });
 
     const price = await this._calcPrice(createDto.orderItems, meals);
+    const kitchens = new Set(
+      meals.map((v) => {
+        return v.kitchenId;
+      }),
+    );
     const res = await this.prisma.order.create({
       data: {
         status: OrderStatus.WaitPayment, //TODO choice right status
         customerSpotId: createDto.customerSpotId,
         orderTypeId: createDto.orderTypeId,
         price: price,
+        kitchenIds: [...kitchens],
         orderItems: {
           createMany: {
             data: createDto.orderItems,
@@ -52,11 +60,13 @@ export class OrderService {
         },
       },
       include: {
-        customerSpot: true,
         type: true,
+        customerSpot: true,
+        orderItems: true,
+        customerFeedBack: true,
       },
     });
-    this._emitToGateway(res, meals);
+    this._emitToGateway(res);
 
     return {
       access_token: this.jwtService.sign({
@@ -66,29 +76,13 @@ export class OrderService {
     };
   }
 
-  private _emitToGateway(
-    res: Order & {
-      customerSpot: CustomerSpot;
-      type: OrderType;
-    },
-    meals: {
-      price: number;
-      id: number;
-      kitchenId: number;
-    }[],
-  ) {
+  private _emitToGateway(res: GetOrderRelation) {
     switch (res.type.selectKitchenVia) {
       case SelectKitchenVia.CustomerSpot:
         this.gateway.emitOrder(res.id, res, [res.customerSpot.kitchenId]);
         break;
       case SelectKitchenVia.Meal:
-        this.gateway.emitOrder(res.id, res, [
-          ...new Set(
-            meals.map((v) => {
-              return v.kitchenId;
-            }),
-          ),
-        ]);
+        this.gateway.emitOrder(res.id, res, res.kitchenIds);
 
         break;
       case SelectKitchenVia.None:
@@ -97,19 +91,39 @@ export class OrderService {
     }
   }
 
-  async updateStatus(id: number, status: OrderStatus) {
-    await this.prisma.order.update({
+  async updateStatusByAdmin(
+    id: number,
+    linkedRestId: number,
+    status: OrderStatus,
+  ) {
+    const batch = await this.prisma.order.updateMany({
       data: {
         status,
       },
       where: {
         id: id,
+        customerSpot: {
+          resturantId: linkedRestId,
+        },
       },
     });
-    this.gateway.emitOrderStatusChangeToCustomer(id,status);
+    if (batch.count == 0) {
+      throw new UnauthorizedException();
+    }
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id,
+      },
+    });
+    this.gateway.emitOrderChange(
+      linkedRestId,
+      order.kitchenIds,
+      order.id,
+      status,
+    );
   }
 
-  async payed(id: number) {
+  async payed(id: number, linkedRestId: number) {
     const order = await this.getOrderById(id);
     order.type.paymentType;
     let nextStatus: OrderStatus;
@@ -118,16 +132,28 @@ export class OrderService {
     } else if (order.type.paymentType == PaymentType.afterTakeOrder) {
       nextStatus = OrderStatus.Done;
     }
-    await this.prisma.order.update({
+    const batch = await this.prisma.order.updateMany({
       data: {
         isPayed: true,
         status: nextStatus,
       },
       where: {
         id: id,
+        customerSpot: {
+          resturantId: linkedRestId,
+        },
       },
     });
-    this.gateway.emitOrderStatusChangeToCustomer(id,nextStatus);
+    if (batch.count == 0) {
+      throw new UnauthorizedException();
+    }
+    this.gateway.emitOrderChange(
+      linkedRestId,
+      order.kitchenIds,
+      order.id,
+      nextStatus,
+      true,
+    );
   }
 
   async getOrderById(id: number): Promise<GetOrderDto> {
@@ -138,6 +164,56 @@ export class OrderService {
       include: {
         type: true,
         customerSpot: true,
+      },
+    });
+  }
+
+  async getCurrentOrderForKitchen(
+    kitchenId: number,
+  ): Promise<GetOrderRelation[]> {
+    return this.prisma.order.findMany({
+      where: {
+        isPayed: false,
+        OR: [
+          {
+            customerSpot: {
+              kitchenId,
+            },
+          },
+          {
+            orderItems: {
+              some: {
+                meal: {
+                  kitchenId,
+                },
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        type: true,
+        customerSpot: true,
+        orderItems: true,
+        customerFeedBack: true,
+      },
+    });
+  }
+
+  async getCurrentOrderForResturant(
+    restId: number,
+  ): Promise<GetOrderRelation[]> {
+    return this.prisma.order.findMany({
+      where: {
+        customerSpot: {
+          resturantId: restId,
+        },
+      },
+      include: {
+        type: true,
+        customerSpot: true,
+        orderItems: true,
+        customerFeedBack: true,
       },
     });
   }
@@ -184,5 +260,12 @@ export class OrderService {
 
 export type GetOrderDto = Order & {
   customerSpot: CustomerSpot;
+  type: OrderType;
+};
+
+export type GetOrderRelation = Order & {
+  orderItems: OrderItem[];
+  customerSpot: CustomerSpot;
+  customerFeedBack: CustomerFeedBack;
   type: OrderType;
 };
