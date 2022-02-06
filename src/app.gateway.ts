@@ -17,8 +17,7 @@ import { GetOrderDto, GetOrderRelation } from './order/order.service';
 import { OrderStatus } from '@prisma/client';
 
 @WebSocketGateway({
-  transports:['websocket'],
-  
+  transports: ['websocket'],
 })
 export class AppGateway implements OnGatewayConnection, OnApplicationBootstrap {
   constructor(
@@ -45,10 +44,12 @@ export class AppGateway implements OnGatewayConnection, OnApplicationBootstrap {
         if (!user?.resturantId) {
           return next(error);
         }
+
         socket.data['payload'] = user;
       } else if (payload.type == JwtType.order) {
         socket.data['payload'] = payload;
       }
+      next();
     });
   }
 
@@ -116,8 +117,6 @@ export class AppGateway implements OnGatewayConnection, OnApplicationBootstrap {
     // }
   }
 
-
-
   emitOrder(resturantId: number, order: GetOrderRelation, kitchenId: number[]) {
     this.logger.log(
       `create new order kitchenId=${kitchenId} resturantId=${resturantId}`,
@@ -131,9 +130,7 @@ export class AppGateway implements OnGatewayConnection, OnApplicationBootstrap {
     key,
     value,
   ) {
-    this.server.to(`ResturnatOrder-${resturantId}`).allSockets().then(console.log)
 
-    this.server.allSockets().then(console.log)
     this.server.to(`ResturnatOrder-${resturantId}`).emit(key, value);
     if (kitchenId)
       kitchenId.forEach((v) => {
