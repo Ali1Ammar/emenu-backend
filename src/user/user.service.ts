@@ -15,8 +15,8 @@ export class UserService {
     });
   }
 
-  async findById(id: number, selectPassword=false): Promise<any> {
-    return this.prisma.user.findUnique({
+  async findById(id: number, selectPassword=false): Promise<User> {
+    let x=  this.prisma.user.findUnique({
       where: {
         id,
       },
@@ -29,6 +29,7 @@ export class UserService {
         userName: true,
       },
     });
+    return x;
   }
 
   async enusreHasPermission(id: number[], permission: UserPermissions) {

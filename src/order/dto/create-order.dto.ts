@@ -1,17 +1,18 @@
 import { Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   IsArray,
   IsNumber,
   IsOptional,
   IsString,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 
 export class CreateOrderDto {
-  @IsArray({
-    each: true,
-  })
-  @MinLength(1)
+  @IsArray({})
+  @ValidateNested({ each: true })
+  @ArrayMinSize(1)
   @Type(() => CreateOrderItemDto)
   orderItems: CreateOrderItemDto[];
   @IsNumber()

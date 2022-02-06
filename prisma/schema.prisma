@@ -127,7 +127,7 @@ model OrderItem {
   id      Int    @id @default(autoincrement())
   meal    Meal   @relation(fields: [mealId], references: [id])
   count   Int
-  notes   String
+  notes   String?
   mealId  Int
   Order   Order  @relation(fields: [orderId], references: [id])
   orderId Int

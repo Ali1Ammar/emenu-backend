@@ -6,7 +6,7 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
+import { Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
@@ -16,64 +16,112 @@ import { OrderJwt, UserJwt } from 'src/auth/payload.decoration';
 import { GetOrderDto, GetOrderRelation } from './order/order.service';
 import { OrderStatus } from '@prisma/client';
 
-@WebSocketGateway()
-export class AppGateway implements OnGatewayConnection {
+@WebSocketGateway({
+  transports:['websocket'],
+  
+})
+export class AppGateway implements OnGatewayConnection, OnApplicationBootstrap {
   constructor(
     private jwtService: JwtService,
     private userService: UserService,
   ) {}
+  onApplicationBootstrap() {
+    this.server.use(async (socket, next) => {
+      const error = new Error(
+        'please provide authorization token for admin user has resturantId',
+      );
+      this.logger.log('use middleware auth');
+      const token = socket.handshake.headers.authorization;
+      if (!token) {
+        return next(error);
+      }
+
+      const payload = this.jwtService.verify(token);
+      if (!payload) {
+        return next(error);
+      }
+      if (payload.type == JwtType.login) {
+        const user = await this.userService.findById(payload.id);
+        if (!user?.resturantId) {
+          return next(error);
+        }
+        socket.data['payload'] = user;
+      } else if (payload.type == JwtType.order) {
+        socket.data['payload'] = payload;
+      }
+    });
+  }
 
   @WebSocketServer()
   server: Server;
 
+  private logger: Logger = new Logger('AppGateway');
+
   @SubscribeMessage('subsribeToResturnatOrder')
-  async cacher(client: Socket): Promise<void> {
+  async cacher(client: Socket): Promise<any> {
+    this.logger.log('subsribeToResturnatOrder');
+
     let user = client.data.payload as UserJwt;
-    if (!user?.resturantId)
-      client.send(
-        'please provide authorization token for admin user has resturantId',
-      );
+
     const key = `ResturnatOrder-${user.resturantId}`;
     await client.join(key);
-    client.send(`Done will be emit at ${key}`, key);
+    this.logger.log(`subsribeToResturnatOrder done ${key}`);
+
+    return 'Done';
   }
 
   @SubscribeMessage('subsribeToResturnatKitchenOrder')
-  async kitchen(client: Socket, kitchenId: number): Promise<void> {
+  async kitchen(client: Socket, kitchenId: number): Promise<any> {
+    this.logger.log('subsribeToResturnatKitchenOrder ' + kitchenId);
+
     let user = client.data.payload as UserJwt;
     if (!user?.resturantId)
-      client.send(
-        'please provide authorization token for admin user has resturantId',
-      );
+      return 'please provide authorization token for admin user has resturantId';
     const key = `ResturnatKitchenOrder-${user.resturantId}-${kitchenId}`; //TODO check if kitchen belongs to same resturant
     await client.join(key);
-    client.send(`Done will be emit at ${key}`, key);
+    return 'Done';
   }
 
   @SubscribeMessage('CustomerOrder')
-  async customerOrder(client: Socket): Promise<void> {
+  async customerOrder(client: Socket): Promise<any> {
+    this.logger.log('CustomerOrder called');
     let order = client.data.payload;
     if (order?.type || order!.type != JwtType.order)
-      client.send('please provide authorization token for customer order');
+      return 'please provide authorization token for customer order';
     const key = `CustomerOrder-${order.id}`;
     await client.join(key);
-    client.send(`Done will be emit at ${key}`, key);
+    return `Done will be emit at ${key}`;
   }
 
-  handleConnection(client: Socket, req: Request) {
-    const token = client.handshake.headers.authorization;
+  async handleConnection(client: Socket, req: Request) {
+    this.logger.log('user conntect');
+    // const token = client.handshake.headers.authorization;
+    // if (!token) {
+    //   return this.disconntectClient(client);
+    // }
 
-    const payload = this.jwtService.verify(token);
-    if (!payload) client.disconnect();
-    if (payload.type == JwtType.login) {
-      const user = this.userService.findById(payload.id);
-      client.data['payload'] = user;
-    } else if (payload.type == JwtType.order) {
-      client.data['payload'] = payload;
-    }
+    // const payload = this.jwtService.verify(token);
+    // if (!payload) {
+    //   return this.disconntectClient(client);
+    // }
+    // if (payload.type == JwtType.login) {
+    //   const user = await this.userService.findById(payload.id);
+    //   if (!user?.resturantId) {
+    //     return this.disconntectClient(client);
+    //   }
+    //   // console.log();
+    //   client.data['payload'] = user;
+    // } else if (payload.type == JwtType.order) {
+    //   client.data['payload'] = payload;
+    // }
   }
+
+
 
   emitOrder(resturantId: number, order: GetOrderRelation, kitchenId: number[]) {
+    this.logger.log(
+      `create new order kitchenId=${kitchenId} resturantId=${resturantId}`,
+    );
     this.emitToRestAndKitchen(resturantId, kitchenId, 'order', order);
   }
 
@@ -83,6 +131,9 @@ export class AppGateway implements OnGatewayConnection {
     key,
     value,
   ) {
+    this.server.to(`ResturnatOrder-${resturantId}`).allSockets().then(console.log)
+
+    this.server.allSockets().then(console.log)
     this.server.to(`ResturnatOrder-${resturantId}`).emit(key, value);
     if (kitchenId)
       kitchenId.forEach((v) => {
