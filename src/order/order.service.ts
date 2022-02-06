@@ -76,17 +76,18 @@ export class OrderService {
     };
   }
 
-  private _emitToGateway(res: GetOrderRelation) {
-    switch (res.type.selectKitchenVia) {
+  private _emitToGateway(order: GetOrderRelation) {
+    const restId = order.type.resturantId
+    switch (order.type.selectKitchenVia) {
       case SelectKitchenVia.CustomerSpot:
-        this.gateway.emitOrder(res.id, res, [res.customerSpot.kitchenId]);
+        this.gateway.emitOrder(restId, order, [order.customerSpot.kitchenId]);
         break;
       case SelectKitchenVia.Meal:
-        this.gateway.emitOrder(res.id, res, res.kitchenIds);
+        this.gateway.emitOrder(restId, order, order.kitchenIds);
 
         break;
       case SelectKitchenVia.None:
-        this.gateway.emitOrder(res.id, res, undefined);
+        this.gateway.emitOrder(restId, order, undefined);
         break;
     }
   }
