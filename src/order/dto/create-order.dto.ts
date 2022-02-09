@@ -29,4 +29,6 @@ export class CreateOrderItemDto {
   @IsOptional()
   @IsString()
   notes: string;
+  @IsArray()
+  selectedExtra : string[]
 }

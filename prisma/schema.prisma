@@ -115,6 +115,7 @@ model Meal {
   desc          String
   img           String
   price         Float
+  extra String[]
   isDisabled Boolean @default(false)
   subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
   subCategoryId Int
@@ -128,6 +129,7 @@ model OrderItem {
   meal    Meal   @relation(fields: [mealId], references: [id])
   count   Int
   notes   String?
+  selectedExtra String[]
   mealId  Int
   Order   Order  @relation(fields: [orderId], references: [id])
   orderId Int

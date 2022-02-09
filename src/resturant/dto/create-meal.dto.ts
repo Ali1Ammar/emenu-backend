@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateMealDto {
   @IsString()
@@ -19,4 +19,7 @@ export class CreateMealDto {
   @Type((_)=>Number)
   @IsNumber()
   kitchenId?: number;
+
+  @IsArray()
+  extra: string[]
 }
