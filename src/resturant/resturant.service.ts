@@ -64,8 +64,6 @@ export class ResturantService {
         },
       });
     } catch (e) {
-      console.log('e');
-
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === 'P2002') {
           throw DefinedErrors.wrongInput(

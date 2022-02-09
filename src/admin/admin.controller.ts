@@ -43,7 +43,6 @@ export class AdminController {
     @Body() body: CreateResturantAndAdminDto,
     @UploadedFile() img: Express.Multer.File,
   ): Promise<Resturant> {
-    console.log(img, body);
     if (body.adminsId == undefined && !body.admin) {
       throw DefinedErrors.wrongInput(
         'please create new admin or links with admin using adminsId',

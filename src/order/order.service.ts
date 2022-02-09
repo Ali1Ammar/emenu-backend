@@ -127,7 +127,6 @@ export class OrderService {
         id,
       },
     });
-    console.log(order,status);
     this.gateway.emitOrderChange(
       linkedRestId,
       order.kitchenIds,
