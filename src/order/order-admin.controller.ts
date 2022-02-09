@@ -45,54 +45,69 @@ export class OrderAdminController {
     return this.orderService.getCurrentOrderForResturant(user.resturantId!);
   }
 
-  @Post('cooked/:orderId')
+  // @Post('cooked/:orderId')
+  // @UseGuards(
+  //   new PermissionGuard(
+  //     UserPermissions.ResturantAdmin,
+  //     UserPermissions.Kitchen,
+  //   ),
+  // )
+  // kitchenDoneCook(@Param('orderId') orderId: number, @Payload() user: UserJwt) {
+  //   return this.orderService.updateStatusByAdmin(
+  //     orderId,
+  //     user.resturantId,
+  //     OrderStatus.DoneByKitchen,
+  //   );
+  // }
+
+  // @Post('deliver/:orderId')
+  // @UseGuards(
+  //   new PermissionGuard(
+  //     UserPermissions.ResturantAdmin,
+  //     UserPermissions.Kitchen,
+  //   ),
+  // )
+  // kitchenDeliver(@Param('orderId') orderId: number, @Payload() user: UserJwt) {
+  //   return this.orderService.updateStatusByAdmin(
+  //     orderId,
+  //     user.resturantId,
+  //     OrderStatus.DeliveredByKitchen,
+  //   );
+  // }
+
+  @Post('status/:orderId')
   @UseGuards(
     new PermissionGuard(
       UserPermissions.ResturantAdmin,
       UserPermissions.Kitchen,
     ),
   )
-  kitchenDoneCook(@Param('orderId') orderId: number, @Payload() user: UserJwt) {
+  changeStatus(@Param('orderId') orderId: number,@Body("status") status:OrderStatus, @Payload() user: UserJwt) {
     return this.orderService.updateStatusByAdmin(
       orderId,
       user.resturantId,
-      OrderStatus.DoneByKitchen,
+      status
     );
   }
 
-  @Post('deliver/:orderId')
-  @UseGuards(
-    new PermissionGuard(
-      UserPermissions.ResturantAdmin,
-      UserPermissions.Kitchen,
-    ),
-  )
-  kitchenDeliver(@Param('orderId') orderId: number, @Payload() user: UserJwt) {
-    return this.orderService.updateStatusByAdmin(
-      orderId,
-      user.resturantId,
-      OrderStatus.DeliveredByKitchen,
-    );
-  }
-
-  @Post('cancel/:orderId')
-  @UseGuards(
-    new PermissionGuard(
-      UserPermissions.ResturantAdmin,
-      UserPermissions.Kitchen,
-      UserPermissions.Cacher,
-    ),
-  )
-  cancelOrder(
-    @Param('orderId') orderId: number,
-    @Body('msg') msg: string,
-    @Payload() user: UserJwt,
-  ) {
-    //TODO return msg to user
-    return this.orderService.updateStatusByAdmin(
-      orderId,
-      user.resturantId,
-      OrderStatus.Canceled,
-    );
-  }
+  // @Post('cancel/:orderId')
+  // @UseGuards(
+  //   new PermissionGuard(
+  //     UserPermissions.ResturantAdmin,
+  //     UserPermissions.Kitchen,
+  //     UserPermissions.Cacher,
+  //   ),
+  // )
+  // cancelOrder(
+  //   @Param('orderId') orderId: number,
+  //   @Body('msg') msg: string,
+  //   @Payload() user: UserJwt,
+  // ) {
+  //   //TODO return msg to user
+  //   return this.orderService.updateStatusByAdmin(
+  //     orderId,
+  //     user.resturantId,
+  //     OrderStatus.Canceled,
+  //   );
+  // }
 }

@@ -7,6 +7,8 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { AppGateway } from './app.gateway';
 import configuration, { OurConfigService } from './config.service';
+import { OrderModule } from './order/order.module';
+import { OrderService } from './order/order.service';
 import { PrismaService } from './prisma.service';
 import { UserModule } from './user/user.module';
 import { UserService } from './user/user.service';
@@ -34,7 +36,8 @@ import { UserService } from './user/user.service';
       }),
       inject: [OurConfigService],
     }),
-    UserModule
+    UserModule,
+    OrderModule
   ],
   providers: [OurConfigService, PrismaService, AppGateway],
   exports: [OurConfigService, PrismaService, AppGateway,JwtModule,MulterModule],

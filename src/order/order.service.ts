@@ -1,8 +1,14 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   CustomerFeedBack,
   CustomerSpot,
+  Meal,
   Order,
   OrderItem,
   OrderStatus,
@@ -21,6 +27,7 @@ export class OrderService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    @Inject(forwardRef(() => AppGateway))
     private gateway: AppGateway,
   ) {}
 
@@ -62,7 +69,11 @@ export class OrderService {
       include: {
         type: true,
         customerSpot: true,
-        orderItems: true,
+        orderItems: {
+          include:{
+            meal:true
+          }
+        },
         customerFeedBack: true,
       },
     });
@@ -77,7 +88,7 @@ export class OrderService {
   }
 
   private _emitToGateway(order: GetOrderRelation) {
-    const restId = order.type.resturantId
+    const restId = order.type.resturantId;
     switch (order.type.selectKitchenVia) {
       case SelectKitchenVia.CustomerSpot:
         this.gateway.emitOrder(restId, order, [order.customerSpot.kitchenId]);
@@ -116,6 +127,7 @@ export class OrderService {
         id,
       },
     });
+    console.log(order,status);
     this.gateway.emitOrderChange(
       linkedRestId,
       order.kitchenIds,
@@ -192,10 +204,19 @@ export class OrderService {
           },
         ],
       },
+      orderBy : [
+        {
+          id:"asc"
+        }
+      ],
       include: {
         type: true,
         customerSpot: true,
-        orderItems: true,
+        orderItems: {
+          include:{
+            meal:true
+          }
+        },
         customerFeedBack: true,
       },
     });
@@ -210,10 +231,19 @@ export class OrderService {
           resturantId: restId,
         },
       },
+      orderBy : [
+        {
+          id:"asc"
+        }
+      ],
       include: {
         type: true,
         customerSpot: true,
-        orderItems: true,
+        orderItems: {
+          include: {
+            meal: true,
+          },
+        },
         customerFeedBack: true,
       },
     });
@@ -265,7 +295,9 @@ export type GetOrderDto = Order & {
 };
 
 export type GetOrderRelation = Order & {
-  orderItems: OrderItem[];
+  orderItems: (OrderItem & {
+    meal: Meal;
+  })[];
   customerSpot: CustomerSpot;
   customerFeedBack: CustomerFeedBack;
   type: OrderType;
