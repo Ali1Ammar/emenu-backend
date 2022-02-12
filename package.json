@@ -18,9 +18,11 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "reset" : "prisma migrate reset  --skip-seed -f --skip-generate && prisma db push && prisma db seed"
   },
   "dependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.6",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.1.6",
     "@nestjs/core": "^8.0.0",
@@ -95,5 +97,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  }
+  },
+  "prisma": {
+    "seed": "node --loader ts-node/esm prisma/seed.ts"
+    }
 }
