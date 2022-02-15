@@ -6,9 +6,10 @@ async function main() {
   const userData: Prisma.UserCreateInput[] = [
     {
       name: 'admin2',
-      password: "$argon2i$v=19$m=4196,t=3,p=1$9fV7OvDjXuQwFEDt+xRv1w$c82ektuHHtZAK1cDVDlF8gK7vzr7E1ldyMNJsqTYFIg",
+      password:
+        '$argon2i$v=19$m=4196,t=3,p=1$9fV7OvDjXuQwFEDt+xRv1w$c82ektuHHtZAK1cDVDlF8gK7vzr7E1ldyMNJsqTYFIg',
       userName: 'admin2',
-      permissons: [UserPermissions.SystemAdmin],
+      permissons: [UserPermissions.SystemAdmin,'ResturantAdmin'],
     },
   ];
 
@@ -19,9 +20,9 @@ async function main() {
       location: faker.address.city(),
       customerSpot: {
         createMany: {
-          data: Array(7).map((d) => {
+          data: Array.from({ length: 7 }, (_, i) => {
             return {
-              identifier: `table ${d + 1}`,
+              identifier: `table ${i + 1}`,
             };
           }),
         },
@@ -142,36 +143,51 @@ async function main() {
 
   const mealsData: Prisma.MealCreateInput[] = [
     {
-      title: "بركر فاير",
-      desc: "200 غرام من الحمه مع البصل المقرمش والمشروم",
+      title: 'بركر فاير',
+      desc: '200 غرام من الحمه مع البصل المقرمش والمشروم',
       img: 'uploaded/Best-Burger-5.jpg',
       price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
       subCategory: {
         connect: { id: 1 },
+      },
+      kitchen : {
+        connect:{
+          id:1
+        }
       },
       extra: {
         set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
       },
     },
     {
-      title: "بركر دجاج",
-      desc: "200 غرام من دجاج مع البصل المقرمش وصلصه الثوم",
+      title: 'بركر دجاج',
+      desc: '200 غرام من دجاج مع البصل المقرمش وصلصه الثوم',
       img: 'uploaded/Best-Burger-5.jpg',
       price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
       subCategory: {
         connect: { id: 1 },
+      },
+      kitchen : {
+        connect:{
+          id:1
+        }
       },
       extra: {
         set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
       },
     },
     {
-      title: "بركر محشي شاورما",
-      desc: "200 غرام من  الحمه وشاورما مع البصل المقرمش والمشروم",
+      title: 'بركر محشي شاورما',
+      desc: '200 غرام من  الحمه وشاورما مع البصل المقرمش والمشروم',
       img: 'uploaded/Best-Burger-5.jpg',
       price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
       subCategory: {
         connect: { id: 1 },
+      },
+      kitchen : {
+        connect:{
+          id:1
+        }
       },
       extra: {
         set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
