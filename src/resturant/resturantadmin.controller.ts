@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Param,
+  Put,
 } from '@nestjs/common';
 import { CustomerSpot, UserPermissions } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -18,18 +19,18 @@ import {
   CreateSubCategoryDto,
 } from './dto/create-category.dto';
 import { CreateKitchenDto } from './dto/create-kitchen.dto';
-import { CreateMealDto } from './dto/create-meal.dto';
+import { CreateMealDto, EditMealDto } from './dto/create-meal.dto';
 import { CreateOrderTypeDto } from './dto/create-ordertype.dto';
 import { ResturantService } from './resturant.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HasResturantGuard } from './has_resturant.gurad';
+import { ImgHelper } from 'src/helper/img';
 
 @Controller('resturantadmin')
 @UseGuards(
   new JwtAuthGuard(),
   new PermissionGuard(UserPermissions.ResturantAdmin),
-  new HasResturantGuard()
-
+  new HasResturantGuard(),
 )
 export class ResturantAdminController {
   constructor(private readonly resturantService: ResturantService) {}
@@ -45,8 +46,8 @@ export class ResturantAdminController {
     @Payload() user: UserJwt,
     @UploadedFile() img: Express.Multer.File,
   ) {
-    
-    if(typeof data.children == 'string'){// when using form data and sent one element this make it recive as string
+    if (typeof data.children == 'string') {
+      // when using form data and sent one element this make it recive as string
       data.children = [data.children];
     }
     await this.resturantService.addMainCategory(
@@ -78,36 +79,60 @@ export class ResturantAdminController {
   }
 
   @Post('meal')
-  @UseInterceptors(FileInterceptor('img'))
+  @UseInterceptors(ImgHelper.fileInterceptor())
   async addMeal(
-    @Body() data:CreateMealDto,
+    @Body() data: CreateMealDto,
     @Payload() user: UserJwt,
     @UploadedFile() img: Express.Multer.File,
   ) {
-    return await this.resturantService.addMeal(user.resturantId, data, img.path);
+    if (typeof data.extra == 'string') {
+      // when using form data and sent one element this make it recive as string
+      data.extra = [data.extra];
+    }
+    const meal = await this.resturantService.addMeal(user.resturantId, data);
+    const path = await ImgHelper.saveMealImg(img, user.resturantId, meal.id);
+    await this.resturantService.editMealImage(meal.id, path);
+    meal.img = path;
+    return meal;
   }
 
-  @Get("meal")
+  @Put('meal/:id')
+  @UseInterceptors(ImgHelper.fileInterceptor())
+  async editMeal(
+    @Body() data: EditMealDto,
+    @Param('id') id: number,
+    @Payload() user: UserJwt,
+    @UploadedFile() img: Express.Multer.File,
+  ) {
+    if (typeof data.extra == 'string') {
+      // when using form data and sent one element this make it recive as string
+      data.extra = [data.extra];
+    }
+    const meal = await this.resturantService.editMeal(
+      id,
+      user.resturantId,
+      data,
+    );
+    if (img != null) {
+      const path = await ImgHelper.saveMealImg(img, user.resturantId, meal.id);
+      meal.img = path;
+      await this.resturantService.editMealImage(meal.id, path);
+    }
+    return meal;
+  }
+
+  @Get('meal')
   async getLinkedMealResturant(@Payload() user: UserJwt) {
-    // this.enureUserHasRest(user);
     return this.resturantService.findMealByResturantId(user.resturantId);
   }
 
   @Get()
   async getLinkedResturant(@Payload() user: UserJwt) {
-    // this.enureUserHasRest(user);
     return this.resturantService.findById(user.resturantId);
   }
 
-  @Post('active/:val')
-  activeResturant(@Param('val') active: boolean, @Payload() user: UserJwt) {
-    // this.enureUserHasRest(user);
-    return this.resturantService.acriveResturant(user.resturantId, active);
+  @Post('/meal/:id/active/:val')
+  activeResturant(@Param('val') active: boolean, @Payload() user: UserJwt , @Param("id") id:number ) {
+    return this.resturantService.activeMeal(user.resturantId,id, active);
   }
-
-  // enureUserHasRest(user: UserJwt) {
-  //   if (!user.resturantId) {
-  //     throw DefinedErrors.wrongInput('this user does not has resturant');
-  //   }
-  // }
 }

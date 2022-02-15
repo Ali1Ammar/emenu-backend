@@ -1,3 +1,4 @@
+import { NestInterceptor, Type } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { promises } from 'fs';
 
@@ -13,8 +14,9 @@ export class ImgHelper {
     file: Express.Multer.File,
     restId: number,
     mealId: number,
-  ) : Promise<string> {
-    const fileExt = file.filename.split('.')[-1];
+  ): Promise<string> {
+    const fileExt = file.originalname.split('.').pop(); // get last element
+    await promises.mkdir(`./uploaded/${restId}`, { recursive: true });
     const path = `./uploaded/${restId}/${mealId}.${fileExt}`;
     await promises.writeFile(path, file.buffer);
     return path;

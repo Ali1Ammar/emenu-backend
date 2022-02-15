@@ -10,19 +10,19 @@ import {
   SubCategory,
   UserPermissions,
 } from '@prisma/client';
-import { PrismaService } from 'src/prisma.service';
 import {
   CreateMainCategoryDto,
   CreateSubCategoryDto,
 } from './dto/create-category.dto';
 import { CreateKitchenDto } from './dto/create-kitchen.dto';
-import { CreateMealDto } from './dto/create-meal.dto';
+import { CreateMealDto, EditMealDto } from './dto/create-meal.dto';
 import { CreateOrderTypeDto } from './dto/create-ordertype.dto';
 import { CreateResturantAndAdminDto } from './dto/create-resturant.dto';
 import { CreateSpotDto } from './dto/create-spot.dto';
 import { PrismaHelper } from '../helper/prisma_helper';
 import { DefinedErrors } from 'src/error/error';
 import { PasswordHashHelper } from 'src/helper/hash_password';
+import { PrismaService } from 'src/prisma.service';
 @Injectable()
 export class ResturantService {
   constructor(private prisma: PrismaService) {}
@@ -208,7 +208,7 @@ export class ResturantService {
   async editMeal(
     mealId: number,
     resturantId: number,
-    meal: CreateMealDto,
+    meal: EditMealDto,
   ): Promise<Meal> {
     const subCategory = await this.prisma.subCategory.findFirst({
       where: {
@@ -321,11 +321,28 @@ export class ResturantService {
         id,
       },
       data: {
-        isDisabled: !active,
+        isDisabled: active,
       },
     });
     return res;
   }
+
+  async activeMeal(id: number,restId : number, active: boolean) {
+    const res = await this.prisma.meal.updateMany({
+      where: {
+        id,
+        kitchen:{
+          resturantId:restId
+        }
+      },
+      data: {
+        isDisabled: active,
+      },
+    });
+    return res;
+  }
+
+
 
   private unAuthrize() {
     //TODO
