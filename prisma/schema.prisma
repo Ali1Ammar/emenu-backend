@@ -113,7 +113,7 @@ model Meal {
   id            Int         @id @default(autoincrement())
   title         String
   desc          String
-  img           String
+  img           String?
   price         Float
   extra String[]
   isDisabled Boolean @default(false)

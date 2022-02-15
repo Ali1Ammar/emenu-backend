@@ -16,18 +16,18 @@ import { UserService } from './user/user.service';
 @Global()
 @Module({
   imports: [
-    MulterModule.register({
-      storage: diskStorage({
-        destination: 'uploaded',
-        filename:(req,file,cb)=>{
-          
-          const randomName =randomUUID();
-          //Calling the callback passing the random name generated with the original extension name
-          cb(null, `${randomName}${extname(file.originalname)}`);
-        }
-        // filename: editFileName,
-      }),
-    }),
+    // MulterModule.register({
+    //   storage: diskStorage({
+    //     destination: 'uploaded',
+    //     filename:(req,file,cb)=>{
+    //       // req.
+    //       const randomName =randomUUID();
+    //       //Calling the callback passing the random name generated with the original extension name
+    //       cb(null, `${randomName}${extname(file.originalname)}`);
+    //     }
+    //     // filename: editFileName,
+    //   }),
+    // }),
     ConfigModule.forRoot({ load: [configuration] }),
     JwtModule.registerAsync({
       useFactory: async (configService: OurConfigService) => ({

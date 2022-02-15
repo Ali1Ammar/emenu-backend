@@ -85,11 +85,6 @@ export class ResturantService {
           },
         },
         identifier: spot.identifier,
-        orderType: {
-          connect: {
-            id: 2,
-          },
-        },
         // kitchen: {
         //   connect: {
         //     id: spot.kitchenId,
@@ -118,11 +113,13 @@ export class ResturantService {
         ...category,
         img,
         resturantId: resturantId,
-        children : {
-          createMany : {
-            data :  category.children.map((v)=>{return {"title":v}})
-          }
-        }
+        children: {
+          createMany: {
+            data: category.children.map((v) => {
+              return { title: v };
+            }),
+          },
+        },
       },
     });
   }
@@ -161,7 +158,6 @@ export class ResturantService {
   async addMeal(
     resturantId: number,
     meal: CreateMealDto,
-    img: string,
   ): Promise<Meal> {
     const subCategory = await this.prisma.subCategory.findFirst({
       where: {
@@ -171,7 +167,7 @@ export class ResturantService {
         },
       },
       select: {
-        id:true
+        id: true,
       },
     });
     if (subCategory == null) this.unAuthrize();
@@ -182,14 +178,65 @@ export class ResturantService {
           id: meal.kitchenId,
           resturantId: resturantId,
         },
-        select: {id:true},
+        select: { id: true },
       });
       if (kitchen == null) this.unAuthrize();
     }
     return this.prisma.meal.create({
       data: {
         ...meal,
-        img,
+      },
+    });
+  }
+
+  async editMealImage(
+    mealId: number,
+    img: string,
+  ) {
+    await this.prisma.meal.updateMany({
+      where:{
+        id:mealId
+      },
+      data: {
+        img:img
+      },
+    });
+  }
+
+
+
+  async editMeal(
+    mealId: number,
+    resturantId: number,
+    meal: CreateMealDto,
+  ): Promise<Meal> {
+    const subCategory = await this.prisma.subCategory.findFirst({
+      where: {
+        id: meal.subCategoryId,
+        mainCategory: {
+          resturantId: resturantId,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (subCategory == null) this.unAuthrize();
+
+    if (meal.kitchenId) {
+      const kitchen = await this.prisma.kitchen.findFirst({
+        where: {
+          id: meal.kitchenId,
+          resturantId: resturantId,
+        },
+        select: { id: true },
+      });
+      if (kitchen == null) this.unAuthrize();
+    }
+    return this.prisma.meal.update({
+      where: { id: mealId },
+      data: {
+        ...meal,
       },
     });
   }
@@ -228,9 +275,9 @@ export class ResturantService {
   async findMealByResturantId(id: number): Promise<Meal[]> {
     const res = await this.prisma.meal.findMany({
       where: {
-        kitchen : {
-          resturantId: id
-        }
+        kitchen: {
+          resturantId: id,
+        },
       },
       // include: {
       //   // kitchen: true,
