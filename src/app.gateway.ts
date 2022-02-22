@@ -3,14 +3,23 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { forwardRef, Inject, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Logger,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { JwtType } from 'src/auth/jwt-auth.guard';
 import { OrderJwt, UserJwt } from 'src/auth/payload.decoration';
-import { GetOrderDto, GetOrderRelation, OrderService } from './order/order.service';
+import {
+  GetOrderDto,
+  GetOrderRelation,
+  OrderService,
+} from './order/order.service';
 import { OrderStatus } from '@prisma/client';
 import { socketAuthMiddleware } from './auth/socket.auth.middleware';
 
@@ -22,12 +31,17 @@ export class AppGateway implements OnApplicationBootstrap {
     private jwtService: JwtService,
     private userService: UserService,
     @Inject(forwardRef(() => OrderService))
-    private orderService: OrderService
+    private orderService: OrderService,
   ) {}
   onApplicationBootstrap() {
-    this.server.use((socket, next) =>
-      socketAuthMiddleware(socket, next, this.jwtService, this.userService),
-    );
+    this.server.use((socket, next) => {
+      return socketAuthMiddleware(
+        socket,
+        next,
+        this.jwtService,
+        this.userService,
+      );
+    });
   }
 
   @WebSocketServer()
@@ -38,12 +52,15 @@ export class AppGateway implements OnApplicationBootstrap {
   @SubscribeMessage('subsribeToResturnatOrder')
   async cacher(client: Socket): Promise<any> {
     let user = client.data.payload as UserJwt;
+    this.logger.log('subsribeToResturnatOrder ' + user.resturantId);
+
     const key = `ResturnatOrder-${user.resturantId}`;
-    const orders = await this.orderService.getCurrentOrderForResturant(user.resturantId);
+    const orders = await this.orderService.getCurrentOrderForResturant(
+      user.resturantId,
+    );
     await client.join(key);
     return orders;
   }
-  
 
   @SubscribeMessage('subsribeToResturnatKitchenOrder')
   async kitchen(client: Socket, kitchenId: number): Promise<any> {
@@ -98,12 +115,21 @@ export class AppGateway implements OnApplicationBootstrap {
     status?: OrderStatus,
     isPayed?: boolean,
   ) {
+    this.logger.log(
+      `chabge  order orderId=${orderId} resturantId=${resturantId} status=${status} isPayed=${isPayed}`,
+    );
     const change = {
       id: orderId,
       status,
       isPayed,
     };
     this.emitToRestAndKitchen(resturantId, kitchenId, 'order-change', change);
+    this.server
+      .to(`CustomerOrder-${orderId}`)
+      .allSockets()
+      .then((v) => {
+        this.logger.log([...v].join(', '));
+      });
     this.server.to(`CustomerOrder-${orderId}`).emit('order-change', change);
   }
 }

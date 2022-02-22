@@ -15,8 +15,10 @@ export class CreateOrderDto {
   @ArrayMinSize(1)
   @Type(() => CreateOrderItemDto)
   orderItems: CreateOrderItemDto[];
+
+  @IsOptional()
   @IsNumber()
-  customerSpotId: number;
+  customerSpotId?: number;
   @IsNumber()
   orderTypeId: number;
 }
@@ -26,6 +28,7 @@ export class CreateOrderItemDto {
   count: number;
   @IsNumber()
   mealId: number;
+
   @IsOptional()
   @IsString()
   notes: string;

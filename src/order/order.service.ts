@@ -53,9 +53,15 @@ export class OrderService {
         return v.kitchenId;
       }),
     );
+    const orderType = await this.prisma.orderType.findUnique({
+      where: { id: createDto.orderTypeId },
+    });
     const res = await this.prisma.order.create({
       data: {
-        status: OrderStatus.WaitPayment, //TODO choice right status
+        status:
+          orderType.paymentType == 'beforeTakeOrder'
+            ? OrderStatus.WaitPayment
+            : OrderStatus.WaitInKitchen,
         customerSpotId: createDto.customerSpotId,
         orderTypeId: createDto.orderTypeId,
         price: price,
@@ -70,9 +76,9 @@ export class OrderService {
         type: true,
         customerSpot: true,
         orderItems: {
-          include:{
-            meal:true
-          }
+          include: {
+            meal: true,
+          },
         },
         customerFeedBack: true,
       },
@@ -81,9 +87,11 @@ export class OrderService {
 
     return {
       access_token: this.jwtService.sign({
-        ...res,
+        id: res.id,
+        price: res.price,
         type: JwtType.order,
       }),
+      order: res,
     };
   }
 
@@ -114,7 +122,7 @@ export class OrderService {
       },
       where: {
         id: id,
-        customerSpot: {
+        type: {
           resturantId: linkedRestId,
         },
       },
@@ -151,9 +159,9 @@ export class OrderService {
       },
       where: {
         id: id,
-        customerSpot: {
-          resturantId: linkedRestId,
-        },
+        type : {
+          resturantId:linkedRestId
+        }
       },
     });
     if (batch.count == 0) {
@@ -185,7 +193,7 @@ export class OrderService {
   ): Promise<GetOrderRelation[]> {
     return this.prisma.order.findMany({
       where: {
-        isPayed: false,
+        // isPayed: false,
         OR: [
           {
             customerSpot: {
@@ -203,18 +211,18 @@ export class OrderService {
           },
         ],
       },
-      orderBy : [
+      orderBy: [
         {
-          id:"asc"
-        }
+          id: 'asc',
+        },
       ],
       include: {
         type: true,
         customerSpot: true,
         orderItems: {
-          include:{
-            meal:true
-          }
+          include: {
+            meal: true,
+          },
         },
         customerFeedBack: true,
       },
@@ -226,14 +234,14 @@ export class OrderService {
   ): Promise<GetOrderRelation[]> {
     return this.prisma.order.findMany({
       where: {
-        customerSpot: {
-          resturantId: restId,
+        type : {
+          resturantId:restId
         },
       },
-      orderBy : [
+      orderBy: [
         {
-          id:"asc"
-        }
+          id: 'asc',
+        },
       ],
       include: {
         type: true,

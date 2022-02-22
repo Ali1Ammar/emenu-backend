@@ -9,9 +9,9 @@ export class PermissionGuard implements CanActivate {
   }
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const permissons: UserPermissions[] = request?.user?.permissons;
-    if (!permissons) return false;
-    return checker(permissons,this.arg);
+    const userPermissons: UserPermissions[] = request?.user?.permissons;
+    if (!userPermissons) return false;
+    return checker(userPermissons,this.arg);
   }
 }
 

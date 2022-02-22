@@ -13,8 +13,18 @@ export class ResturantController {
     return this.resturantService.findAllForClient();
   }
 
+  // @Get(':id/order-type')
+  // getResturantOrderType(@Param('id') id : number){
+  //   return this.resturantService.findByIdForClient(id);
+  // }
+
+  @Get('meal/:subCategoryId')
+  getMeals(@Param('subCategoryId') subCategoryId : number ){
+    return this.resturantService.findMealForCustomer(subCategoryId);
+  }
+
  
- @Get(':id')
+  @Get(':id')
   getResturantInfo(@Param('id') id : number){
     return this.resturantService.findByIdForClient(id);
   }

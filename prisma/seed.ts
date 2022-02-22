@@ -9,15 +9,16 @@ async function main() {
       password:
         '$argon2i$v=19$m=4196,t=3,p=1$9fV7OvDjXuQwFEDt+xRv1w$c82ektuHHtZAK1cDVDlF8gK7vzr7E1ldyMNJsqTYFIg',
       userName: 'admin2',
-      permissons: [UserPermissions.SystemAdmin,'ResturantAdmin'],
+      permissons: ['ResturantAdmin'],
     },
   ];
 
   const restData: Prisma.ResturantCreateInput[] = [
     {
       name: 'firefireburger',
-      img: faker.image.food(),
+      img: "uploaded/logo.png",
       location: faker.address.city(),
+      isDisabled:false,
       customerSpot: {
         createMany: {
           data: Array.from({ length: 7 }, (_, i) => {
@@ -36,6 +37,44 @@ async function main() {
         create: {
           deliverMsg: 'جار احضار طلبك',
           deliverType: 'employeerDeliverFood',
+          selectCustomerSpot: true,
+          name: 'داخل المطعم',
+          paymentMsg: 'انتضر الويتر للدفع',
+          paymentType: 'beforeTakeOrder',
+          selectKitchenVia: 'None',
+          kitchen: {
+            create: {
+              resturantId: 1,
+              name: 'main',
+            },
+          },
+        },
+      },
+    },    {
+      name: 'buger king',
+      img: "uploaded/logo3.jpeg",
+      location: faker.address.city(),
+      isDisabled:false,
+
+      customerSpot: {
+        createMany: {
+          data: Array.from({ length: 7 }, (_, i) => {
+            return {
+              identifier: `table ${i + 1}`,
+            };
+          }),
+        },
+      },
+      admins: {
+        connect: {
+          id: 0,
+        },
+      },
+      orderType: {
+        create: {
+          deliverMsg: 'جار احضار طلبك',
+          deliverType: 'employeerDeliverFood',
+          selectCustomerSpot: true,
           name: 'داخل المطعم',
           paymentMsg: 'انتضر الويتر للدفع',
           paymentType: 'beforeTakeOrder',
@@ -150,10 +189,10 @@ async function main() {
       subCategory: {
         connect: { id: 1 },
       },
-      kitchen : {
-        connect:{
-          id:1
-        }
+      kitchen: {
+        connect: {
+          id: 1,
+        },
       },
       extra: {
         set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
@@ -167,10 +206,10 @@ async function main() {
       subCategory: {
         connect: { id: 1 },
       },
-      kitchen : {
-        connect:{
-          id:1
-        }
+      kitchen: {
+        connect: {
+          id: 1,
+        },
       },
       extra: {
         set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
@@ -179,15 +218,84 @@ async function main() {
     {
       title: 'بركر محشي شاورما',
       desc: '200 غرام من  الحمه وشاورما مع البصل المقرمش والمشروم',
-      img: 'uploaded/Best-Burger-5.jpg',
+      img: 'uploaded/index.jpeg',
       price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
       subCategory: {
         connect: { id: 1 },
       },
-      kitchen : {
-        connect:{
-          id:1
-        }
+      kitchen: {
+        connect: {
+          id: 1,
+        },
+      },
+      extra: {
+        set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
+      },
+    },
+    {
+      title: '  شاورما',
+      desc: '20    وشاورما مع البصل المقرمش والمشروم',
+      img: 'uploaded/88aef3e6-53d4-460b-afc1-0862458103f9.jpeg',
+      price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
+      subCategory: {
+        connect: { id: 2 },
+      },
+      kitchen: {
+        connect: {
+          id: 1,
+        },
+      },
+      extra: {
+        set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
+      },
+    },
+    {
+      title: '  شاورما',
+      desc: '20    وشاورما مع البصل المقرمش والمشروم',
+      img: 'uploaded/pizza2.jpg',
+      price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
+      subCategory: {
+        connect: { id: 2 },
+      },
+      kitchen: {
+        connect: {
+          id: 1,
+        },
+      },
+      extra: {
+        set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
+      },
+    },
+    {
+      title: '  بيتوا دجاج',
+      desc: '20    وشاورما مع البصل المقرمش والمشروم',
+      img: 'uploaded/pizza2.jpg',
+      price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
+      subCategory: {
+        connect: { id: 2 },
+      },
+      kitchen: {
+        connect: {
+          id: 1,
+        },
+      },
+      extra: {
+        set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
+      },
+    },
+
+    {
+      title: '  بيتوا دجاج',
+      desc: '20    وشاورما مع البصل المقرمش والمشروم',
+      img: 'uploaded/pizza2.jpg',
+      price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
+      subCategory: {
+        connect: { id: 2 },
+      },
+      kitchen: {
+        connect: {
+          id: 1,
+        },
       },
       extra: {
         set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],

@@ -145,7 +145,7 @@ model OrderType {
   resturant      Resturant    @relation(fields: [resturantId], references: [id])
   resturantId    Int
   selectKitchenVia SelectKitchenVia
-
+  selectCustomerSpot Boolean
   order          Order[]
   customerSpot   CustomerSpot[]
   kitchen        Kitchen[]
@@ -156,9 +156,9 @@ model Order {
   id               Int               @id @default(autoincrement())
   orderItems       OrderItem[]
   kitchenIds Int[]
-  status           OrderStatus
-  customerSpot     CustomerSpot      @relation(fields: [customerSpotId], references: [id])
-  customerSpotId   Int
+  status OrderStatus
+  customerSpot     CustomerSpot?      @relation(fields: [customerSpotId], references: [id])
+  customerSpotId   Int?
   customerFeedBack CustomerFeedBack?
   type             OrderType         @relation(fields: [orderTypeId], references: [id])
   orderTypeId      Int
