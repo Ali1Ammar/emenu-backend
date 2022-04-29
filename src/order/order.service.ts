@@ -71,6 +71,7 @@ export class OrderService {
             data: createDto.orderItems,
           },
         },
+      resturantId:orderType.resturantId
       },
       include: {
         type: true,
@@ -159,9 +160,9 @@ export class OrderService {
       },
       where: {
         id: id,
-        type : {
-          resturantId:linkedRestId
-        }
+        type: {
+          resturantId: linkedRestId,
+        },
       },
     });
     if (batch.count == 0) {
@@ -234,8 +235,8 @@ export class OrderService {
   ): Promise<GetOrderRelation[]> {
     return this.prisma.order.findMany({
       where: {
-        type : {
-          resturantId:restId
+        type: {
+          resturantId: restId,
         },
       },
       orderBy: [
@@ -259,18 +260,21 @@ export class OrderService {
   async addCustomerFeedbackAndMarkAsDone(
     id: number,
     feedback: CreateCustomerFeedBackDto,
-  ) {
-    await this.prisma.order.update({
+  ) : Promise<CustomerFeedBack> {
+    const order = await this.prisma.order.update({
       data: {
-        customerFeedBack: feedback
-          ? {
-              create: feedback,
-            }
-          : undefined,
         status: OrderStatus.Done,
       },
       where: {
         id: id,
+      },
+      
+    });
+    return this.prisma.customerFeedBack.create({
+      data: {
+        orderId: id,
+        resturantId:order.resturantId ,
+        ...feedback,
       },
     });
   }

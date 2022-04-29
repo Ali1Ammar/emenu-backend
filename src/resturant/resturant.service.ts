@@ -25,6 +25,13 @@ import { PasswordHashHelper } from 'src/helper/hash_password';
 import { PrismaService } from 'src/prisma.service';
 @Injectable()
 export class ResturantService {
+  getFeedback(resturantId: number) {
+    return this.prisma.customerFeedBack.findMany({
+      where: {
+        resturantId: resturantId,
+      },
+    });
+  }
   constructor(private prisma: PrismaService) {}
 
   async createResturantAndAdmin(

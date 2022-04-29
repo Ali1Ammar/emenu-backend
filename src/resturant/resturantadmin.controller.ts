@@ -135,4 +135,10 @@ export class ResturantAdminController {
   activeResturant(@Param('val') active: boolean, @Payload() user: UserJwt , @Param("id") id:number ) {
     return this.resturantService.activeMeal(user.resturantId,id, active);
   }
+
+
+  @Get("/feedback")
+  async getFeedback(@Payload() user: UserJwt) {
+    return this.resturantService.getFeedback(user.resturantId);
+  }
 }
