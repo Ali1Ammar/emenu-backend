@@ -19,7 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "reset" : "prisma migrate reset  --skip-seed -f --skip-generate && prisma db push && prisma db seed"
+    "reset": "prisma migrate reset  --skip-seed -f --skip-generate && prisma db push && prisma db seed"
   },
   "dependencies": {
     "@faker-js/faker": "^6.0.0-alpha.6",
@@ -34,7 +34,7 @@
     "@nestjs/serve-static": "^2.2.2",
     "@nestjs/swagger": "^5.1.5",
     "@nestjs/websockets": "^8.2.5",
-    "@prisma/client": "^3.7.0",
+    "@prisma/client": "^3.12.0",
     "@types/argon2": "^0.15.0",
     "argon2": "^0.28.3",
     "class-transformer": "^0.5.1",
@@ -70,7 +70,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^27.2.5",
     "prettier": "^2.3.2",
-    "prisma": "^3.7.0",
+    "prisma": "^3.12.0",
     "prisma-dbml-generator": "^0.8.3",
     "prisma-erd-generator": "^0.8.0",
     "source-map-support": "^0.5.20",
@@ -100,5 +100,5 @@
   },
   "prisma": {
     "seed": "node --loader ts-node/esm prisma/seed.ts"
-    }
+  }
 }
