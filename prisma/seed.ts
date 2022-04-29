@@ -11,14 +11,21 @@ async function main() {
       userName: 'admin2',
       permissons: ['ResturantAdmin'],
     },
+    {
+      name: 'admin2',
+      password:
+        '$argon2i$v=19$m=4196,t=3,p=1$9fV7OvDjXuQwFEDt+xRv1w$c82ektuHHtZAK1cDVDlF8gK7vzr7E1ldyMNJsqTYFIg',
+      userName: 'admin25',
+      permissons: ['ResturantAdmin'],
+    },
   ];
 
   const restData: Prisma.ResturantCreateInput[] = [
     {
       name: 'firefireburger',
-      img: "uploaded/logo.png",
+      img: 'uploaded/burgerlogo.png',
       location: faker.address.city(),
-      isDisabled:false,
+      isDisabled: false,
       customerSpot: {
         createMany: {
           data: Array.from({ length: 7 }, (_, i) => {
@@ -50,11 +57,12 @@ async function main() {
           },
         },
       },
-    },    {
+    },
+    {
       name: 'buger king',
-      img: "uploaded/logo3.jpeg",
+      img: 'uploaded/burget-king.png',
       location: faker.address.city(),
-      isDisabled:false,
+      isDisabled: false,
 
       customerSpot: {
         createMany: {
@@ -67,7 +75,45 @@ async function main() {
       },
       admins: {
         connect: {
-          id: 0,
+          id: 2,
+        },
+      },
+      orderType: {
+        create: {
+          deliverMsg: 'جار احضار طلبك',
+          deliverType: 'employeerDeliverFood',
+          selectCustomerSpot: true,
+          name: 'داخل المطعم',
+          paymentMsg: 'انتضر الويتر للدفع',
+          paymentType: 'beforeTakeOrder',
+          selectKitchenVia: 'None',
+          kitchen: {
+            create: {
+              resturantId: 1,
+              name: 'main',
+            },
+          },
+        },
+      },
+    },
+    {
+      name: 'pizza hut',
+      img: 'uploaded/pizzahut.jpg',
+      location: faker.address.city(),
+      isDisabled: false,
+
+      customerSpot: {
+        createMany: {
+          data: Array.from({ length: 7 }, (_, i) => {
+            return {
+              identifier: `table ${i + 1}`,
+            };
+          }),
+        },
+      },
+      admins: {
+        connect: {
+          id: 2,
         },
       },
       orderType: {
@@ -131,7 +177,7 @@ async function main() {
     {
       title: 'المطبخ الشرقي',
       desc: 'اشهى الاكلات الشرقية والعربية',
-      img: 'uploaded/Best-Burger-5.jpg',
+      img: 'uploaded/east.png',
       children: {
         createMany: {
           data: [
@@ -157,9 +203,9 @@ async function main() {
       },
     },
     {
-      title: 'المطبخ الغربي',
-      desc: 'اشهى الاكلات الغربية والاوربيا ',
-      img: 'uploaded/Best-Burger-5.jpg',
+      title: 'المطبخ الايطالي',
+      desc: 'اشهى الاكلات  الايطاليا , بيتزا وباستا ',
+      img: 'uploaded/pizza2.jpg',
       children: {
         createMany: {
           data: [
@@ -168,6 +214,9 @@ async function main() {
             },
             {
               title: 'ستيك',
+            },
+            {
+              title: 'باستا',
             },
           ],
         },
@@ -267,7 +316,7 @@ async function main() {
       },
     },
     {
-      title: '  بيتوا دجاج',
+      title: '  بيتزا دجاج',
       desc: '20    وشاورما مع البصل المقرمش والمشروم',
       img: 'uploaded/pizza2.jpg',
       price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
@@ -285,7 +334,7 @@ async function main() {
     },
 
     {
-      title: '  بيتوا دجاج',
+      title: '  بيتزا دجاج',
       desc: '20    وشاورما مع البصل المقرمش والمشروم',
       img: 'uploaded/pizza2.jpg',
       price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
@@ -299,6 +348,199 @@ async function main() {
       },
       extra: {
         set: ['اضافة بصل', 'اضافة جبن', 'ازالة المخلل'],
+      },
+    },
+  ];
+
+  const orderData: Prisma.OrderCreateInput[] = [
+    {
+      price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
+      isPayed: true,
+      resturant: {
+        connect: {
+          id: 1,
+        },
+      },
+      status: 'Done',
+      type: {
+        connect: {
+          id: 1,
+        },
+      },
+      orderItems: {
+        create: [
+          {
+            count: 3,
+            mealId: 1,
+            notes: 'اضافة بصل',
+            selectedExtra: ['اضافة بصل', 'اضافة بصل'],
+          },
+        ],
+      },
+      customerFeedBack: {
+        create: {
+          desc: 'الاكل سيئ',
+          rate: 3,
+          type: ['BadTiming', 'BadFood', 'BadService'],
+          resturantId: 1,
+        },
+      },
+      customerSpot: {
+        connect: {
+          id: 3,
+        },
+      },
+    },
+    {
+      price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
+      isPayed: true,
+      resturant: {
+        connect: {
+          id: 1,
+        },
+      },
+      status: 'Done',
+      type: {
+        connect: {
+          id: 1,
+        },
+      },
+      orderItems: {
+        create: [
+          {
+            count: 3,
+            mealId: 1,
+            notes: 'اضافة بصل',
+            selectedExtra: ['اضافة بصل', 'اضافة بصل'],
+          },
+        ],
+      },
+      customerFeedBack: {
+        create: {
+          desc: 'الاكل سيئ',
+          rate: 5,
+          type: ['BadTiming'],
+          resturantId: 1,
+        },
+      },
+      customerSpot: {
+        connect: {
+          id: 3,
+        },
+      },
+    },
+    {
+      price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
+      isPayed: true,
+      resturant: {
+        connect: {
+          id: 1,
+        },
+      },
+      status: 'Done',
+      type: {
+        connect: {
+          id: 1,
+        },
+      },
+      orderItems: {
+        create: [
+          {
+            count: 3,
+            mealId: 1,
+            notes: 'اضافة بصل',
+            selectedExtra: ['اضافة بصل', 'اضافة بصل'],
+          },
+        ],
+      },
+      customerFeedBack: {
+        create: {
+          desc: 'الاكل سيئ',
+          rate: 5,
+          type: ['BadTiming'],
+          resturantId: 1,
+        },
+      },
+      customerSpot: {
+        connect: {
+          id: 3,
+        },
+      },
+    },
+    {
+      price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
+      isPayed: true,
+      resturant: {
+        connect: {
+          id: 1,
+        },
+      },
+      status: 'Done',
+      type: {
+        connect: {
+          id: 1,
+        },
+      },
+      orderItems: {
+        create: [
+          {
+            count: 3,
+            mealId: 1,
+            notes: 'اضافة بصل',
+            selectedExtra: ['اضافة بصل', 'اضافة بصل'],
+          },
+        ],
+      },
+      customerFeedBack: {
+        create: {
+          desc: 'الاكل سيئ',
+          rate: 5,
+          type: ['BadTiming'],
+          resturantId: 1,
+        },
+      },
+      customerSpot: {
+        connect: {
+          id: 3,
+        },
+      },
+    },
+    {
+      price: faker.datatype.number({ min: 5111, max: 11111, precision: 5111 }),
+      isPayed: true,
+      resturant: {
+        connect: {
+          id: 1,
+        },
+      },
+      status: 'Done',
+      type: {
+        connect: {
+          id: 1,
+        },
+      },
+      orderItems: {
+        create: [
+          {
+            count: 3,
+            mealId: 1,
+            notes: 'اضافة بصل',
+            selectedExtra: ['اضافة بصل', 'اضافة بصل'],
+          },
+        ],
+      },
+      customerFeedBack: {
+        create: {
+          desc: 'الاكل سيئ',
+          rate: 5,
+          type: ['BadTiming'],
+          resturantId: 1,
+        },
+      },
+      customerSpot: {
+        connect: {
+          id: 3,
+        },
       },
     },
   ];
@@ -324,6 +566,12 @@ async function main() {
 
   for (const u of mealsData) {
     const user = await prisma.meal.create({
+      data: u,
+    });
+  }
+
+  for (const u of orderData) {
+    const user = await prisma.order.create({
       data: u,
     });
   }
