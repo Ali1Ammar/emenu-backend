@@ -15,7 +15,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum SystemEmpType {
   Admin
   MangeResturant
@@ -32,7 +31,7 @@ enum DeliverType {
   customerPickFood
 }
 
- enum UserPermissions {
+enum UserPermissions {
   SystemAdmin
   ResturantAdmin
   Cacher
@@ -40,12 +39,12 @@ enum DeliverType {
 }
 
 model User {
-  id          Int              @id @default(autoincrement())
-  userName    String @unique
+  id          Int               @id @default(autoincrement())
+  userName    String            @unique
   name        String
   password    String
   permissons  UserPermissions[]
-  Resturant   Resturant?       @relation(fields: [resturantId], references: [id])
+  Resturant   Resturant?        @relation(fields: [resturantId], references: [id])
   resturantId Int?
 }
 
@@ -62,6 +61,8 @@ model Resturant {
   kitchen      Kitchen[]
   orderType    OrderType[]
 
+  CustomerFeedBack CustomerFeedBack[]
+  Order            Order[]
 }
 
 model Kitchen {
@@ -115,8 +116,8 @@ model Meal {
   desc          String
   img           String?
   price         Float
-  extra String[]
-  isDisabled Boolean @default(false)
+  extra         String[]
+  isDisabled    Boolean     @default(false)
   subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
   subCategoryId Int
   orderItem     OrderItem[]
@@ -125,45 +126,48 @@ model Meal {
 }
 
 model OrderItem {
-  id      Int    @id @default(autoincrement())
-  meal    Meal   @relation(fields: [mealId], references: [id])
-  count   Int
-  notes   String?
+  id            Int      @id @default(autoincrement())
+  meal          Meal     @relation(fields: [mealId], references: [id])
+  count         Int
+  notes         String?
   selectedExtra String[]
-  mealId  Int
-  Order   Order  @relation(fields: [orderId], references: [id])
-  orderId Int
+  mealId        Int
+  Order         Order    @relation(fields: [orderId], references: [id])
+  orderId       Int
 }
 
 model OrderType {
-  id             Int           @id @default(autoincrement())
-  name           String
-  paymentMsg     String
-  deliverMsg     String
-  paymentType    PaymentType
-  deliverType    DeliverType
-  resturant      Resturant    @relation(fields: [resturantId], references: [id])
-  resturantId    Int
-  selectKitchenVia SelectKitchenVia
+  id                 Int              @id @default(autoincrement())
+  name               String
+  paymentMsg         String
+  deliverMsg         String
+  paymentType        PaymentType
+  deliverType        DeliverType
+  resturant          Resturant        @relation(fields: [resturantId], references: [id])
+  resturantId        Int
+  selectKitchenVia   SelectKitchenVia
   selectCustomerSpot Boolean
-  order          Order[]
-  customerSpot   CustomerSpot[]
-  kitchen        Kitchen[]
+  order              Order[]
+  customerSpot       CustomerSpot[]
+  kitchen            Kitchen[]
 
 }
 
 model Order {
   id               Int               @id @default(autoincrement())
   orderItems       OrderItem[]
-  kitchenIds Int[]
-  status OrderStatus
-  customerSpot     CustomerSpot?      @relation(fields: [customerSpotId], references: [id])
+  kitchenIds       Int[]
+  status           OrderStatus
+  customerSpot     CustomerSpot?     @relation(fields: [customerSpotId], references: [id])
   customerSpotId   Int?
   customerFeedBack CustomerFeedBack?
   type             OrderType         @relation(fields: [orderTypeId], references: [id])
   orderTypeId      Int
-  price Float
-  isPayed Boolean @default(false)
+  price            Float
+  isPayed          Boolean           @default(false)
+
+  resturant   Resturant @relation(fields: [resturantId], references: [id])
+  resturantId Int
 }
 
 enum OrderStatus {
@@ -182,6 +186,9 @@ model CustomerFeedBack {
   rate    Int
   type    FeedBackType[]
   orderId Int            @unique
+
+  resturant   Resturant @relation(fields: [resturantId], references: [id])
+  resturantId Int
 }
 
 enum FeedBackType {
@@ -189,7 +196,6 @@ enum FeedBackType {
   BadService
   BadTiming
 }
-
 
 enum SelectKitchenVia {
   None
