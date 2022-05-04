@@ -86,17 +86,10 @@ export class ResturantService {
   addSpot(resturantId: number, spot: CreateSpotDto): Promise<CustomerSpot> {
     return this.prisma.customerSpot.create({
       data: {
-        resturant: {
-          connect: {
-            id: resturantId,
-          },
-        },
+        kitchenId: spot.kitchenId,
+        resturantId: resturantId,
         identifier: spot.identifier,
-        // kitchen: {
-        //   connect: {
-        //     id: spot.kitchenId,
-        //   },
-        // },
+        orderTypeId: spot.orderTypeId,
       },
     });
   }
@@ -162,10 +155,7 @@ export class ResturantService {
     });
   }
 
-  async addMeal(
-    resturantId: number,
-    meal: CreateMealDto,
-  ): Promise<Meal> {
+  async addMeal(resturantId: number, meal: CreateMealDto): Promise<Meal> {
     const subCategory = await this.prisma.subCategory.findFirst({
       where: {
         id: meal.subCategoryId,
@@ -196,21 +186,16 @@ export class ResturantService {
     });
   }
 
-  async editMealImage(
-    mealId: number,
-    img: string,
-  ) {
+  async editMealImage(mealId: number, img: string) {
     await this.prisma.meal.updateMany({
-      where:{
-        id:mealId
+      where: {
+        id: mealId,
       },
       data: {
-        img:img
+        img: img,
       },
     });
   }
-
-
 
   async editMeal(
     mealId: number,
@@ -290,7 +275,7 @@ export class ResturantService {
     return res;
   }
 
-  async findMealForCustomer(subCategoryId : number): Promise<Meal[]> {
+  async findMealForCustomer(subCategoryId: number): Promise<Meal[]> {
     const res = await this.prisma.meal.findMany({
       where: {
         subCategoryId: subCategoryId,
@@ -333,13 +318,13 @@ export class ResturantService {
     return res;
   }
 
-  async activeMeal(id: number,restId : number, active: boolean) {
+  async activeMeal(id: number, restId: number, active: boolean) {
     const res = await this.prisma.meal.updateMany({
       where: {
         id,
-        kitchen:{
-          resturantId:restId
-        }
+        kitchen: {
+          resturantId: restId,
+        },
       },
       data: {
         isDisabled: active,
@@ -347,8 +332,6 @@ export class ResturantService {
     });
     return res;
   }
-
-
 
   private unAuthrize() {
     //TODO

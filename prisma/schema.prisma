@@ -82,13 +82,13 @@ model CustomerSpot {
   isDisabled Boolean @default(false)
 
   identifier  String
-  resturant   Resturant   @relation(fields: [resturantId], references: [id])
+  resturant   Resturant @relation(fields: [resturantId], references: [id])
   order       Order[]
   resturantId Int
-  kitchen     Kitchen?    @relation(fields: [kitchenId], references: [id])
+  kitchen     Kitchen?  @relation(fields: [kitchenId], references: [id])
   kitchenId   Int?
-  orderType   OrderType[]
-
+  orderType   OrderType @relation(fields: [orderTypeId], references: [id])
+  orderTypeId Int
 }
 
 model MainCategory {

@@ -31,6 +31,7 @@ async function main() {
           data: Array.from({ length: 7 }, (_, i) => {
             return {
               identifier: `table ${i + 1}`,
+              orderTypeId: 0,
             };
           }),
         },
@@ -68,6 +69,7 @@ async function main() {
         createMany: {
           data: Array.from({ length: 7 }, (_, i) => {
             return {
+              orderTypeId: 0,
               identifier: `table ${i + 1}`,
             };
           }),
@@ -106,6 +108,7 @@ async function main() {
         createMany: {
           data: Array.from({ length: 7 }, (_, i) => {
             return {
+              orderTypeId: 0,
               identifier: `table ${i + 1}`,
             };
           }),
