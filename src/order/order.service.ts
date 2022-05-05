@@ -194,23 +194,12 @@ export class OrderService {
   ): Promise<GetOrderRelation[]> {
     return this.prisma.order.findMany({
       where: {
-        // isPayed: false,
-        OR: [
-          {
-            customerSpot: {
-              kitchenId,
-            },
-          },
-          {
-            orderItems: {
-              some: {
-                meal: {
-                  kitchenId,
-                },
-              },
-            },
-          },
-        ],
+        status: {
+          notIn: [OrderStatus.Done, OrderStatus.Canceled],
+        },
+        kitchenIds: {
+          has: kitchenId,
+        },
       },
       orderBy: [
         {
@@ -235,8 +224,9 @@ export class OrderService {
   ): Promise<GetOrderRelation[]> {
     return this.prisma.order.findMany({
       where: {
-        type: {
-          resturantId: restId,
+        resturantId: restId,
+        status: {
+          notIn: [OrderStatus.Done, OrderStatus.Canceled],
         },
       },
       orderBy: [

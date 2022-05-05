@@ -36,6 +36,7 @@ enum UserPermissions {
   ResturantAdmin
   Cacher
   Kitchen
+  Waiter
 }
 
 model User {
