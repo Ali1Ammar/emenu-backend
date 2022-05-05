@@ -19,7 +19,7 @@ import {
 import { AppGateway } from 'src/app.gateway';
 import { JwtType } from 'src/auth/jwt-auth.guard';
 import { PrismaService } from 'src/prisma.service';
-import { CreateCustomerFeedBackDto } from './dto/create-feedback.dto';
+import { CreateCustomerFeedBack } from './dto/create-feedback.dto';
 import { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
 
 @Injectable()
@@ -71,7 +71,7 @@ export class OrderService {
             data: createDto.orderItems,
           },
         },
-      resturantId:orderType.resturantId
+        resturantId: orderType.resturantId,
       },
       include: {
         type: true,
@@ -259,8 +259,8 @@ export class OrderService {
 
   async addCustomerFeedbackAndMarkAsDone(
     id: number,
-    feedback: CreateCustomerFeedBackDto,
-  ) : Promise<CustomerFeedBack> {
+    feedback: CreateCustomerFeedBack,
+  ): Promise<CustomerFeedBack> {
     const order = await this.prisma.order.update({
       data: {
         status: OrderStatus.Done,
@@ -268,15 +268,22 @@ export class OrderService {
       where: {
         id: id,
       },
-      
     });
-    return this.prisma.customerFeedBack.create({
-      data: {
-        orderId: id,
-        resturantId:order.resturantId ,
-        ...feedback,
-      },
-    });
+    this.gateway.emitOrderChange(
+      order.resturantId,
+      order.kitchenIds,
+      order.id,
+      OrderStatus.Done,
+    );
+    if (feedback != null) {
+      return this.prisma.customerFeedBack.create({
+        data: {
+          orderId: id,
+          resturantId: order.resturantId,
+          ...feedback,
+        },
+      });
+    }
   }
 
   private async _calcPrice(orderItems: CreateOrderItemDto[], meals) {

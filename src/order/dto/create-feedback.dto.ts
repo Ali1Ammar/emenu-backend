@@ -1,9 +1,17 @@
 import { FeedBackType } from '@prisma/client';
-import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsNumber, IsString, Max, Min, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 
-export class CreateCustomerFeedBackDto {
-    @IsString()
+export class CreateCustomerFeedBack {
+  @IsString()
   desc: string;
   @IsNumber()
   @Min(1)
@@ -13,4 +21,9 @@ export class CreateCustomerFeedBackDto {
   @ValidateNested()
   @IsEnum(FeedBackType)
   type: FeedBackType[];
+}
+
+export class CreateCustomerFeedBackDto {
+  @IsOptional()
+  data?: CreateCustomerFeedBack;
 }

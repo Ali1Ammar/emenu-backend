@@ -17,9 +17,9 @@ export class OrderController {
   @Post('done')
   @UseGuards(new OrderJwtAuthGuard())
   userComplete(
-    @Body() body: CreateCustomerFeedBackDto | null,
+    @Body() body: CreateCustomerFeedBackDto,
     @Payload() order: OrderJwt,
   ) {
-    return this.orderService.addCustomerFeedbackAndMarkAsDone(order.id, body);
+    return this.orderService.addCustomerFeedbackAndMarkAsDone(order.id, body.data);
   }  
 }
