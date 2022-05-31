@@ -19,10 +19,14 @@ import { CreateMealDto, EditMealDto } from './dto/create-meal.dto';
 import { CreateOrderTypeDto } from './dto/create-ordertype.dto';
 import { CreateResturantAndAdminDto } from './dto/create-resturant.dto';
 import { CreateSpotDto } from './dto/create-spot.dto';
-import { PrismaHelper } from '../helper/prisma_helper';
 import { DefinedErrors } from 'src/error/error';
 import { PasswordHashHelper } from 'src/helper/hash_password';
 import { PrismaService } from 'src/prisma.service';
+import {
+  GetResturantClientDto,
+  ResturantRelationDTO,
+} from './dto/get-resturant.dto';
+import { GetCustomerSpotClientDto } from './dto/get-customerspot.dto';
 @Injectable()
 export class ResturantService {
   getFeedback(resturantId: number) {
@@ -306,6 +310,36 @@ export class ResturantService {
     return res;
   }
 
+  async findBySpotIdForClient(id: number): Promise<GetCustomerSpotClientDto> {
+    const res = await this.prisma.customerSpot.findFirst({
+      where: {
+        id,
+        isDisabled: false,
+      },
+      include: {
+        orderType: true,
+        resturant: {
+          include: {
+            mainCategory: {
+              include: {
+                children: {
+                  include: {
+                    meals: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return {
+      spot: res,
+      orderType:res.orderType,
+      resturant:res.resturant
+    };
+  }
+
   async acriveResturant(id: number, active: boolean) {
     const res = await this.prisma.resturant.update({
       where: {
@@ -338,21 +372,3 @@ export class ResturantService {
     throw 'Only Admin Can edit this';
   }
 }
-
-type GetResturantClientDto = Resturant & {
-  mainCategory: (MainCategory & {
-    children: (SubCategory & {
-      meals: Meal[];
-    })[];
-  })[];
-  orderType: OrderType[];
-};
-
-type ResturantRelationDTO = Resturant & {
-  kitchen: Kitchen[];
-  mainCategory: (MainCategory & {
-    children: SubCategory[];
-  })[];
-  customerSpot: CustomerSpot[];
-  orderType: OrderType[];
-};

@@ -23,6 +23,11 @@ export class ResturantController {
     return this.resturantService.findMealForCustomer(subCategoryId);
   }
 
+  @Get('spot/:id')
+  getResturantInfoViaSpotId(@Param('id') id : number){
+    return this.resturantService.findBySpotIdForClient(id);
+  }
+
  
   @Get(':id')
   getResturantInfo(@Param('id') id : number){
