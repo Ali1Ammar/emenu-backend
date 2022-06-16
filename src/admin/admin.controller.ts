@@ -15,6 +15,7 @@ import { CreateSystemAdminDto, RegisterDTO } from 'src/auth/dto/register.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PermissionGuard } from 'src/auth/permission.gurds';
 import { DefinedErrors } from 'src/error/error';
+import { ImgHelper } from 'src/helper/img';
 import {
   CreateResturantAndAdminDto,
   CreateResturantDto,
@@ -38,7 +39,7 @@ export class AdminController {
   }
 
   @Post('resturant')
-  @UseInterceptors(FileInterceptor('img'))
+  @UseInterceptors(ImgHelper.fileInterceptor())
   async createResturant(
     @Body() body: CreateResturantAndAdminDto,
     @UploadedFile() img: Express.Multer.File,
@@ -48,9 +49,14 @@ export class AdminController {
         'please create new admin or links with admin using adminsId',
       );
     }
+    if(img==undefined){
+      throw DefinedErrors.wrongInput('please upload image')
+    }
+    const path = await ImgHelper.saveRestImg(img);
+
     let rest = await this.resturantService.createResturantAndAdmin(
       body,
-      img.path,
+      path,
     );
     if (body.adminsId)
       await this.userSerivice.enusreHasPermission(

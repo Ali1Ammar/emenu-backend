@@ -16,8 +16,33 @@ export class ImgHelper {
     mealId: number,
   ): Promise<string> {
     const fileExt = file.originalname.split('.').pop(); // get last element
-    await promises.mkdir(`./uploaded/${restId}`, { recursive: true });
-    const path = `./uploaded/${restId}/${mealId}.${fileExt}`;
+    await promises.mkdir(`./uploaded/meal/${restId}`, { recursive: true });
+    const path = `./uploaded/meal/${restId}/${mealId}.${fileExt}`;
+    await promises.writeFile(path, file.buffer);
+    return path;
+  }
+
+  static async saveRestImg(
+    file: Express.Multer.File,
+  ): Promise<string> {
+    return this.saveAtRandonNameInFolderImg(file,"logo");
+  }
+
+  static async saveCateImg(
+    file: Express.Multer.File,
+  ): Promise<string> {
+    return this.saveAtRandonNameInFolderImg(file,"category");
+  }
+
+  static async saveAtRandonNameInFolderImg(
+    file: Express.Multer.File,
+    folder: string,
+  ): Promise<string> {
+    const fileExt = file.originalname.split('.').pop(); // get last element
+    await promises.mkdir(`./uploaded/${folder}`, { recursive: true });
+
+    const name = Date.now();
+    const path = `./uploaded/${folder}/${name}.${fileExt}`;
     await promises.writeFile(path, file.buffer);
     return path;
   }

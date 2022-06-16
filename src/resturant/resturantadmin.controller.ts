@@ -40,7 +40,7 @@ export class ResturantAdminController {
   }
 
   @Post('main-category')
-  @UseInterceptors(FileInterceptor('img'))
+  @UseInterceptors(ImgHelper.fileInterceptor())
   async addMainCategory(
     @Body() data: CreateMainCategoryDto,
     @Payload() user: UserJwt,
@@ -50,10 +50,15 @@ export class ResturantAdminController {
       // when using form data and sent one element this make it recive as string
       data.children = [data.children];
     }
+    if(img==undefined){
+      throw DefinedErrors.wrongInput('please upload image')
+    }
+    const path = await ImgHelper.saveCateImg(img);
+
     await this.resturantService.addMainCategory(
       user.resturantId,
       data,
-      img.path,
+      path,
     );
   }
 

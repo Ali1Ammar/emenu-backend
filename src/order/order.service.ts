@@ -266,6 +266,7 @@ export class OrderService {
       OrderStatus.Done,
     );
     if (feedback != null) {
+      console.log("createing");
       return this.prisma.customerFeedBack.create({
         data: {
           orderId: id,
