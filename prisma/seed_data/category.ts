@@ -18,17 +18,9 @@ export const mainCategorys: Prisma.MainCategoryCreateInput[] = [
               title: 'شاورما',
             },
             {
-              title: 'همبركر',
-            },
-            {
               title: 'كنتاكي',
             },
-            {
-              title: 'بيتزا',
-            },
-            {
-              title: 'شاورما',
-            },
+
           ],
         },
       },

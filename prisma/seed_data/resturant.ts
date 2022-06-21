@@ -1,9 +1,10 @@
 import faker from '@faker-js/faker';
 import { Prisma } from '@prisma/client';
 
-export const restData: Prisma.ResturantCreateInput[] = [
+export const restData = [
   {
-    name: 'firefireburger',
+    id:1,
+    name: 'شاورما على نار',
     img: 'uploaded/burgerlogo.png',
     location: faker.address.city(),
     isDisabled: false,
@@ -14,6 +15,8 @@ export const restData: Prisma.ResturantCreateInput[] = [
     },
   },
   {
+    id:2,
+
     name: 'buger king',
     img: 'uploaded/burget-king.png',
     location: faker.address.city(),
@@ -25,6 +28,8 @@ export const restData: Prisma.ResturantCreateInput[] = [
     },
   },
   {
+    id:3,
+
     name: 'pizza hut',
     img: 'uploaded/pizzahut.jpg',
     location: faker.address.city(),
