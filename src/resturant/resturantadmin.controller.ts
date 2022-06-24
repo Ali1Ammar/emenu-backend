@@ -8,6 +8,7 @@ import {
   UploadedFile,
   Param,
   Put,
+  Delete,
 } from '@nestjs/common';
 import { CustomerSpot, UserPermissions } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -25,6 +26,7 @@ import { ResturantService } from './resturant.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HasResturantGuard } from './has_resturant.gurad';
 import { ImgHelper } from 'src/helper/img';
+import { CreateStaffDto } from 'src/auth/dto/register.dto';
 
 @Controller('resturantadmin')
 @UseGuards(
@@ -50,16 +52,12 @@ export class ResturantAdminController {
       // when using form data and sent one element this make it recive as string
       data.children = [data.children];
     }
-    if(img==undefined){
-      throw DefinedErrors.wrongInput('please upload image')
+    if (img == undefined) {
+      throw DefinedErrors.wrongInput('please upload image');
     }
     const path = await ImgHelper.saveCateImg(img);
 
-    await this.resturantService.addMainCategory(
-      user.resturantId,
-      data,
-      path,
-    );
+    await this.resturantService.addMainCategory(user.resturantId, data, path);
   }
 
   @Post('sub-category')
@@ -137,13 +135,31 @@ export class ResturantAdminController {
   }
 
   @Post('/meal/:id/active/:val')
-  activeResturant(@Param('val') active: boolean, @Payload() user: UserJwt , @Param("id") id:number ) {
-    return this.resturantService.activeMeal(user.resturantId,id, active);
+  activeResturant(
+    @Param('val') active: boolean,
+    @Payload() user: UserJwt,
+    @Param('id') id: number,
+  ) {
+    return this.resturantService.activeMeal(user.resturantId, id, active);
   }
 
-
-  @Get("/feedback")
+  @Get('/feedback')
   async getFeedback(@Payload() user: UserJwt) {
     return this.resturantService.getFeedback(user.resturantId);
+  }
+
+  @Get('staff')
+  async getLinkedResturantStaff(@Payload() user: UserJwt) {
+    return this.resturantService.findStaffByResturantId(user.resturantId);
+  }
+
+  @Post('staff')
+  async addStaff(@Body() data: CreateStaffDto, @Payload() user: UserJwt) {
+    return await this.resturantService.addStaff(user.resturantId, data);
+  }
+
+  @Delete('staff/:id')
+  async deleteStaff(@Param('id') userId: number, @Payload() user: UserJwt) {
+    await this.resturantService.deleteStaff(user.resturantId, userId);
   }
 }

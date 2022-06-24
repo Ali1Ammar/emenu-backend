@@ -27,6 +27,7 @@ import {
   ResturantRelationDTO,
 } from './dto/get-resturant.dto';
 import { GetCustomerSpotClientDto } from './dto/get-customerspot.dto';
+import { CreateStaffDto, GetStaffDto } from './dto/staff';
 @Injectable()
 export class ResturantService {
   getFeedback(resturantId: number) {
@@ -159,6 +160,36 @@ export class ResturantService {
     });
   }
 
+  async addStaff(
+    resturantId: number,
+    staff: CreateStaffDto,
+  ): Promise<GetStaffDto> {
+    return this.prisma.user.create({
+      data: {
+        ...staff,
+        password: await PasswordHashHelper.hashPassword(staff.password),
+        resturantId: resturantId,
+      },
+      select: {
+        password: false,
+        id: true,
+        name: true,
+        permissons: true,
+        userName: true,
+        resturantId: true,
+      },
+    });
+  }
+
+  async deleteStaff(resturantId: number, staffId: number){
+    await this.prisma.user.deleteMany({
+      where: {
+        id: staffId,
+        resturantId: resturantId,
+      },
+    });
+  }
+
   async addMeal(resturantId: number, meal: CreateMealDto): Promise<Meal> {
     const subCategory = await this.prisma.subCategory.findFirst({
       where: {
@@ -279,6 +310,23 @@ export class ResturantService {
     return res;
   }
 
+  async findStaffByResturantId(id: number): Promise<GetStaffDto[]> {
+    const res = await this.prisma.user.findMany({
+      where: {
+        resturantId: id,
+      },
+      select: {
+        password: false,
+        id: true,
+        name: true,
+        permissons: true,
+        userName: true,
+        resturantId: true,
+      },
+    });
+    return res;
+  }
+
   async findMealForCustomer(subCategoryId: number): Promise<Meal[]> {
     const res = await this.prisma.meal.findMany({
       where: {
@@ -335,8 +383,8 @@ export class ResturantService {
     });
     return {
       spot: res,
-      orderType:res.orderType,
-      resturant:res.resturant
+      orderType: res.orderType,
+      resturant: res.resturant,
     };
   }
 
