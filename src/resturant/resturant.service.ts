@@ -126,6 +126,9 @@ export class ResturantService {
           },
         },
       },
+      include:{
+        children:true
+      }
     });
   }
 

@@ -57,7 +57,7 @@ export class ResturantAdminController {
     }
     const path = await ImgHelper.saveCateImg(img);
 
-    await this.resturantService.addMainCategory(user.resturantId, data, path);
+    return await this.resturantService.addMainCategory(user.resturantId, data, path);
   }
 
   @Post('sub-category')
