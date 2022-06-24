@@ -190,6 +190,15 @@ export class ResturantService {
     });
   }
 
+  async deleteOrderType(resturantId: number, id: number){
+    await this.prisma.orderType.deleteMany({
+      where: {
+        id: id,
+        resturantId: resturantId,
+      },
+    });
+  }
+
   async addMeal(resturantId: number, meal: CreateMealDto): Promise<Meal> {
     const subCategory = await this.prisma.subCategory.findFirst({
       where: {

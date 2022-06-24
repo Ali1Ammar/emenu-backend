@@ -26,7 +26,7 @@ import { ResturantService } from './resturant.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HasResturantGuard } from './has_resturant.gurad';
 import { ImgHelper } from 'src/helper/img';
-import { CreateStaffDto } from 'src/auth/dto/register.dto';
+import { CreateStaffDto } from './dto/staff';
 
 @Controller('resturantadmin')
 @UseGuards(
@@ -78,7 +78,7 @@ export class ResturantAdminController {
     @Body() data: CreateOrderTypeDto,
     @Payload() user: UserJwt,
   ) {
-    await this.resturantService.addOrderType(user.resturantId, data);
+    return await this.resturantService.addOrderType(user.resturantId, data);
   }
 
   @Post('meal')
@@ -161,5 +161,10 @@ export class ResturantAdminController {
   @Delete('staff/:id')
   async deleteStaff(@Param('id') userId: number, @Payload() user: UserJwt) {
     await this.resturantService.deleteStaff(user.resturantId, userId);
+  }
+
+  @Delete('ordertype/:id')
+  async deleteOrderType(@Param('id') userId: number, @Payload() user: UserJwt) {
+    await this.resturantService.deleteOrderType(user.resturantId, userId);
   }
 }
