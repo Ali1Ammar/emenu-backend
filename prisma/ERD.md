@@ -58,7 +58,7 @@ CustomerSpot CustomerSpot
 Meal Meal
         }
     
-  User {
+  Users {
     Int id PK 
     String userName  
     String name  
@@ -151,8 +151,8 @@ Meal Meal
     FeedBackType type  
     }
   
-    User o|--|| UserPermissions : "enum:permissons"
-    User o{--|| Resturant : "Resturant"
+    Users o|--|| UserPermissions : "enum:permissons"
+    Users o{--|| Resturant : "Resturant"
     Kitchen o{--|| Resturant : "resturatn"
     Kitchen o{--}o OrderType : ""
     CustomerSpot o{--|| Resturant : "resturant"

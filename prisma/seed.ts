@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log(`Start seeding ...`);
-  const data = [rest1,rest2];
+  const data = [rest1, rest2];
   for (const item of data) {
     const { user, orderTypes, category, mealsData, rest, kitchen } = item;
     await prisma.user.create({
@@ -21,7 +21,6 @@ async function main() {
     });
 
     for (const key of orderTypes) {
-
       await prisma.orderType.create({
         data: key,
       });
@@ -37,6 +36,40 @@ async function main() {
         data: key,
       });
     }
+
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"Users"', 'id'), coalesce(max(id)+1, 1), false) FROM "Users";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"Resturant"', 'id'), coalesce(max(id)+1, 1), false) FROM "Resturant";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"Kitchen"', 'id'), coalesce(max(id)+1, 1), false) FROM "Kitchen";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"CustomerSpot"', 'id'), coalesce(max(id)+1, 1), false) FROM "CustomerSpot";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"MainCategory"', 'id'), coalesce(max(id)+1, 1), false) FROM "MainCategory";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"SubCategory"', 'id'), coalesce(max(id)+1, 1), false) FROM "SubCategory";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"Meal"', 'id'), coalesce(max(id)+1, 1), false) FROM "Meal";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"OrderItem"', 'id'), coalesce(max(id)+1, 1), false) FROM "OrderItem";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"OrderType"', 'id'), coalesce(max(id)+1, 1), false) FROM "OrderType";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"Order"', 'id'), coalesce(max(id)+1, 1), false) FROM "Order";`,
+    );
+    await prisma.$queryRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"CustomerFeedBack"', 'id'), coalesce(max(id)+1, 1), false) FROM "CustomerFeedBack";`,
+    );
 
     console.log(`Seeded ${resturantData.name}`);
   }
