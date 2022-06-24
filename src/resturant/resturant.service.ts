@@ -316,6 +316,7 @@ export class ResturantService {
       where: {
         kitchen: {
           resturantId: id,
+          isDisabled:false
         },
       },
     });
@@ -343,6 +344,8 @@ export class ResturantService {
     const res = await this.prisma.meal.findMany({
       where: {
         subCategoryId: subCategoryId,
+        isDisabled:false
+
       },
     });
     return res;
@@ -416,14 +419,12 @@ export class ResturantService {
     const res = await this.prisma.meal.updateMany({
       where: {
         id,
-        kitchen: {
-          resturantId: restId,
-        },
       },
       data: {
         isDisabled: active,
       },
     });
+    console.log(res);
     return res;
   }
 

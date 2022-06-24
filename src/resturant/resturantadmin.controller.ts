@@ -135,7 +135,7 @@ export class ResturantAdminController {
   }
 
   @Post('/meal/:id/active/:val')
-  activeResturant(
+  activeMeal(
     @Param('val') active: boolean,
     @Payload() user: UserJwt,
     @Param('id') id: number,
@@ -166,5 +166,11 @@ export class ResturantAdminController {
   @Delete('ordertype/:id')
   async deleteOrderType(@Param('id') userId: number, @Payload() user: UserJwt) {
     await this.resturantService.deleteOrderType(user.resturantId, userId);
+  }
+
+  @Post('active/:val')
+  activeResturant(@Param('val') active: boolean, @Payload() user: UserJwt) {
+
+    return this.resturantService.acriveResturant(user.resturantId!, active);
   }
 }
