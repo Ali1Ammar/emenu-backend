@@ -146,13 +146,13 @@ export class OrderService {
 
   async payed(id: number, linkedRestId: number) {
     const order = await this.getOrderById(id);
-    order.type.paymentType;
     let nextStatus: OrderStatus;
     if (order.type.paymentType == PaymentType.beforeTakeOrder) {
       nextStatus = OrderStatus.WaitInKitchen;
     } else if (order.type.paymentType == PaymentType.afterTakeOrder) {
       nextStatus = OrderStatus.Done;
     }
+    console.log(nextStatus);
     const batch = await this.prisma.order.updateMany({
       data: {
         isPayed: true,
@@ -160,9 +160,7 @@ export class OrderService {
       },
       where: {
         id: id,
-        type: {
-          resturantId: linkedRestId,
-        },
+        resturantId: linkedRestId,
       },
     });
     if (batch.count == 0) {
@@ -266,7 +264,7 @@ export class OrderService {
       OrderStatus.Done,
     );
     if (feedback != null) {
-      console.log("createing");
+      console.log('createing');
       return this.prisma.customerFeedBack.create({
         data: {
           orderId: id,

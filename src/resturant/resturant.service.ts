@@ -126,9 +126,9 @@ export class ResturantService {
           },
         },
       },
-      include:{
-        children:true
-      }
+      include: {
+        children: true,
+      },
     });
   }
 
@@ -167,24 +167,37 @@ export class ResturantService {
     resturantId: number,
     staff: CreateStaffDto,
   ): Promise<GetStaffDto> {
-    return this.prisma.user.create({
-      data: {
-        ...staff,
-        password: await PasswordHashHelper.hashPassword(staff.password),
-        resturantId: resturantId,
-      },
-      select: {
-        password: false,
-        id: true,
-        name: true,
-        permissons: true,
-        userName: true,
-        resturantId: true,
-      },
-    });
+    try {
+      return await this.prisma.user.create({
+        data: {
+          ...staff,
+          password: await PasswordHashHelper.hashPassword(staff.password),
+          resturantId: resturantId,
+        },
+        select: {
+          password: false,
+          id: true,
+          name: true,
+          permissons: true,
+          userName: true,
+          resturantId: true,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') {
+          throw DefinedErrors.wrongInput(
+            'اسم المستخدم هذا مستعمل الرجاء تغيره',
+          );
+        }
+      }
+
+      throw e;
+    }
   }
 
-  async deleteStaff(resturantId: number, staffId: number){
+  async deleteStaff(resturantId: number, staffId: number) {
     await this.prisma.user.deleteMany({
       where: {
         id: staffId,
@@ -193,7 +206,7 @@ export class ResturantService {
     });
   }
 
-  async deleteOrderType(resturantId: number, id: number){
+  async deleteOrderType(resturantId: number, id: number) {
     await this.prisma.orderType.deleteMany({
       where: {
         id: id,
@@ -316,7 +329,7 @@ export class ResturantService {
       where: {
         kitchen: {
           resturantId: id,
-          isDisabled:false
+          isDisabled: false,
         },
       },
     });
@@ -344,8 +357,7 @@ export class ResturantService {
     const res = await this.prisma.meal.findMany({
       where: {
         subCategoryId: subCategoryId,
-        isDisabled:false
-
+        isDisabled: false,
       },
     });
     return res;

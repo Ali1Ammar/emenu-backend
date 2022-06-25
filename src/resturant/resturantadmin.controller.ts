@@ -28,10 +28,12 @@ import { HasResturantGuard } from './has_resturant.gurad';
 import { ImgHelper } from 'src/helper/img';
 import { CreateStaffDto } from './dto/staff';
 
+// @UseGuards(  new PermissionGuard(UserPermissions.ResturantAdmin),
+// )
+
 @Controller('resturantadmin')
 @UseGuards(
   new JwtAuthGuard(),
-  new PermissionGuard(UserPermissions.ResturantAdmin),
   new HasResturantGuard(),
 )
 export class ResturantAdminController {
