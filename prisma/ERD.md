@@ -37,7 +37,6 @@ Waiter Waiter
             WaitPayment WaitPayment
 WaitInKitchen WaitInKitchen
 DoneByKitchen DoneByKitchen
-DeliveredByKitchen DeliveredByKitchen
 Canceled Canceled
 Done Done
         }

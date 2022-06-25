@@ -177,7 +177,6 @@ enum OrderStatus {
   WaitPayment
   WaitInKitchen
   DoneByKitchen
-  DeliveredByKitchen
   Canceled
   Done
 }
