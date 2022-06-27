@@ -25,4 +25,4 @@ after that run the following in cmd/terminal:
 4- npm start
 ```
 
-the client could be found here https://github.com/Ali1Ammar/emenu-backend
+the client could be found here https://github.com/Ali1Ammar/emenu-client
